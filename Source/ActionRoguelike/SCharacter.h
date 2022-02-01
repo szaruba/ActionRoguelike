@@ -3,11 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SAttributeComponent.h"
 #include "GameFramework/Character.h"
 #include "SCharacter.generated.h"
 
+class USInteractComponent;
 class USpringArmComponent;
 class UCameraComponent;
+class UAnimMontage;
 
 UCLASS()
 class ACTIONROGUELIKE_API ASCharacter : public ACharacter
@@ -26,7 +29,19 @@ protected:
 	UCameraComponent* CameraComp;
 
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<AActor> ProjectileClass;
+	TSubclassOf<AActor> ProjectileClassPrimary;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AActor> ProjectileClassSecondary;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AActor> ProjectileClassTeleport;
+	
+	UPROPERTY(VisibleAnywhere)
+	USInteractComponent* InteractComp;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	USAttributeComponent* AttributeComp;
+
+	UPROPERTY(EditAnywhere, Category="Animation")
+	UAnimMontage* PrimaryAttackAnim;
 
 	void MoveForward(float value);
 	void MoveRight(float value);
@@ -35,7 +50,15 @@ protected:
 	virtual void BeginPlay() override;
 
 	void PrimaryAttack();
+	void SecondaryAttack();
+	void SpawnProjectile(TSubclassOf<AActor> ProjectileClass);
+	void PrimaryInteract();
+	void Teleport();
 
+	UFUNCTION()
+	void OnHealthChanged(USAttributeComponent* OwningComp, AActor* InstigatorActor, float HealthNew, float HealthDelta);
+
+	virtual void PostInitializeComponents() override;
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

@@ -6,6 +6,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "SInteractComponent.h"
 
 
 // Sets default values
@@ -20,6 +21,10 @@ ASCharacter::ASCharacter()
 	
 	CameraComp = CreateDefaultSubobject<UCameraComponent>("Camera");
 	CameraComp->SetupAttachment(SpringArmComp);
+
+	InteractComp = CreateDefaultSubobject<USInteractComponent>("InteractComp");
+
+	AttributeComp = CreateDefaultSubobject<USAttributeComponent>("AttributeComp");
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationYaw = false;
@@ -52,12 +57,77 @@ void ASCharacter::BeginPlay()
 
 void ASCharacter::PrimaryAttack()
 {
+	PlayAnimMontage(PrimaryAttackAnim);
+
+	FTimerHandle TimerHandle_PrimaryAttack;
+	FTimerDelegate TimerDelegate;
+	TimerDelegate.BindUObject(this, &ASCharacter::SpawnProjectile, ProjectileClassPrimary);
+	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, TimerDelegate, 0.2f, false);	
+}
+
+void ASCharacter::SecondaryAttack()
+{
+	PlayAnimMontage(PrimaryAttackAnim);
+	
+	FTimerDelegate TimerDelegate;
+	FTimerHandle TimerHandle;
+	TimerDelegate.BindUObject(this, &ASCharacter::SpawnProjectile, ProjectileClassSecondary);
+	GetWorldTimerManager().SetTimer(TimerHandle, TimerDelegate, 0.2f, false);	
+}
+
+void ASCharacter::SpawnProjectile(TSubclassOf<AActor> ProjectileClass)
+{
+	if (!ensure(ProjectileClass))
+	{
+		return;
+	}
+	
+	FHitResult Hit;
+	FVector CameraLocation;
+	FRotator CameraRot;
+	GetController()->GetPlayerViewPoint(CameraLocation, CameraRot);
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(this);
+	FVector TraceEnd = CameraLocation + 100000 * CameraRot.Vector();
+	GetWorld()->LineTraceSingleByObjectType(Hit, CameraLocation, TraceEnd, FCollisionObjectQueryParams::AllObjects, QueryParams);
+
+	FVector HitLocation = Hit.IsValidBlockingHit() ? Hit.Location : TraceEnd;
+
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnParams.Instigator = this;
 	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
-	FRotator ControlRotation = GetControlRotation();
-	FTransform SpawnTM = FTransform(ControlRotation, HandLocation);
+	FRotator ProjectileRot = (HitLocation - HandLocation).Rotation();
+	FTransform SpawnTM = FTransform(ProjectileRot, HandLocation);
 	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
+}
+
+void ASCharacter::PrimaryInteract()
+{
+	InteractComp->PrimaryInteract();
+}
+
+void ASCharacter::Teleport()
+{
+	FTimerHandle TimerHandle;
+	FTimerDelegate TimerDelegate;
+	TimerDelegate.BindUObject(this, &ASCharacter::SpawnProjectile, ProjectileClassTeleport);
+	GetWorldTimerManager().SetTimer(TimerHandle, TimerDelegate, 0.2f, false);
+}
+
+void ASCharacter::OnHealthChanged(USAttributeComponent* OwningComp, AActor* InstigatorActor, float HealthNew,
+	float HealthDelta)
+{
+	if (HealthNew <= 0.f && HealthDelta < 0.f)
+	{
+		DisableInput(Cast<APlayerController>(GetController()));
+	}
+}
+
+void ASCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	AttributeComp->OnHealthChanged.AddDynamic(this, &ASCharacter::OnHealthChanged);
 }
 
 // Called every frame
@@ -76,6 +146,9 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAxis("Lookup", this, &APawn::AddControllerPitchInput);
 
 	PlayerInputComponent->BindAction("PrimaryAttack", EInputEvent::IE_Pressed, this, &ASCharacter::PrimaryAttack);
+	PlayerInputComponent->BindAction("SecondaryAttack", EInputEvent::IE_Pressed, this, &ASCharacter::SecondaryAttack);
+	PlayerInputComponent->BindAction("PrimaryInteract", EInputEvent::IE_Pressed, this, &ASCharacter::PrimaryInteract);
 	PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Pressed, this, &ACharacter::Jump);
+	PlayerInputComponent->BindAction("Teleport", IE_Pressed, this, &ASCharacter::Teleport);
 }
 
