@@ -42,6 +42,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category="Animation")
 	UAnimMontage* PrimaryAttackAnim;
+	UPROPERTY(EditAnywhere)
+	UParticleSystem* PrimaryAttack_Particles;
 
 	void MoveForward(float value);
 	void MoveRight(float value);

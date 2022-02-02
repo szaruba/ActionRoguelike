@@ -17,6 +17,9 @@ ASMagicProjectile::ASMagicProjectile()
 	PrimaryActorTick.bCanEverTick = true;
 
 	Damage = 20.f;
+	
+	Hit_CameraShake_InnerRadius = 10000.f;
+	Hit_CameraShake_OuterRadius = 20000.f;
 }
 
 // Called when the game starts or when spawned
@@ -61,5 +64,11 @@ void ASMagicProjectile::HandleOnActorHit(UPrimitiveComponent* HitComponent, AAct
 
 		Explode();
 	}
+}
+
+void ASMagicProjectile::Explode()
+{
+	Super::Explode();
+	// UGameplayStatics::PlayWorldCameraShake(this, Hit_CameraShake, GetActorLocation(), Hit_CameraShake_InnerRadius, Hit_CameraShake_OuterRadius);
 }
 

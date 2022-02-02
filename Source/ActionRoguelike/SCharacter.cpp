@@ -7,6 +7,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "SInteractComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 
 // Sets default values
@@ -57,6 +58,7 @@ void ASCharacter::BeginPlay()
 
 void ASCharacter::PrimaryAttack()
 {
+	UGameplayStatics::SpawnEmitterAttached(PrimaryAttack_Particles, GetMesh(), "Muzzle_01");
 	PlayAnimMontage(PrimaryAttackAnim);
 
 	FTimerHandle TimerHandle_PrimaryAttack;
