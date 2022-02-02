@@ -118,6 +118,12 @@ void ASCharacter::Teleport()
 void ASCharacter::OnHealthChanged(USAttributeComponent* OwningComp, AActor* InstigatorActor, float HealthNew,
 	float HealthDelta)
 {
+	if (HealthDelta < 0.f)
+	{
+		// hit flash
+		GetMesh()->SetScalarParameterValueOnMaterials("TimeOfHit", GetWorld()->GetTimeSeconds());
+	}
+	
 	if (HealthNew <= 0.f && HealthDelta < 0.f)
 	{
 		DisableInput(Cast<APlayerController>(GetController()));
