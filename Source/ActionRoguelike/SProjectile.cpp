@@ -3,6 +3,7 @@
 
 #include "SProjectile.h"
 
+#include "Components/AudioComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
 
@@ -23,6 +24,9 @@ ASProjectile::ASProjectile()
 	MovementComp = CreateDefaultSubobject<UProjectileMovementComponent>("MovementComp");
 	MovementComp->bRotationFollowsVelocity = true;
 	MovementComp->ProjectileGravityScale = 0.f;
+
+	AudioComp = CreateDefaultSubobject<UAudioComponent>("AudioComp");
+	AudioComp->SetupAttachment(ParticleSystemComp);
 }
 
 // Called when the game starts or when spawned
@@ -38,9 +42,10 @@ void ASProjectile::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void ASProjectile::Explode_Implementation()
+void ASProjectile::Explode()
 {
 	UGameplayStatics::SpawnEmitterAtLocation(this, ExplodeParticles, GetActorLocation());
+	UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
 	Destroy();
 }
 

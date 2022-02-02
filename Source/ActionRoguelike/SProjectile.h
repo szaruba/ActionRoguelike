@@ -38,11 +38,17 @@ protected:
 	UPROPERTY(EditAnywhere)
 	UParticleSystem* ExplodeParticles;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UAudioComponent* AudioComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	USoundBase* ImpactSound;
+
 	UPROPERTY(EditAnywhere)
 	float MaxLifetime;
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	void Explode();
+	UFUNCTION(BlueprintCallable)
+	virtual void Explode();
 
 public:
 	virtual void PostInitializeComponents() override;

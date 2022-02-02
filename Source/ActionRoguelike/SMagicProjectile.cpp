@@ -43,10 +43,8 @@ void ASMagicProjectile::HandleOnOverlap(UPrimitiveComponent* OverlappedComponent
 		{
 			AttributeComp->ApplyHealthChange(GetInstigator(), -Damage);
 		}
-		DrawDebugSphere(GetWorld(), SweepResult.Location, CollisionComp->GetScaledSphereRadius(), 32, FColor::Red, false, 2.f, 0, 2);
 
-		UGameplayStatics::SpawnEmitterAtLocation(this, ExplodeParticles, SweepResult.Location);
-		Destroy();
+		Explode();
 	}
 }
 
@@ -60,10 +58,8 @@ void ASMagicProjectile::HandleOnActorHit(UPrimitiveComponent* HitComponent, AAct
 		{
 			AttributeComp->ApplyHealthChange(GetInstigator(), -Damage);
 		}
-		DrawDebugSphere(GetWorld(), Hit.Location, CollisionComp->GetScaledSphereRadius(), 64, FColor::Green, false, 2.f, 0, 2);
 
-		UGameplayStatics::SpawnEmitterAtLocation(this, ExplodeParticles, Hit.Location);
-		Destroy();
+		Explode();
 	}
 }
 
