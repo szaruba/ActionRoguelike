@@ -31,3 +31,8 @@ bool USAttributeComponent::IsAlive() const
 	return Health > 0;
 }
 
+bool USAttributeComponent::IsFullHealth() const
+{
+	return Health == HealthMax;
+}
+

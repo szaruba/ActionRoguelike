@@ -32,6 +32,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool IsAlive() const;
 
+	UFUNCTION(BlueprintPure)
+	bool IsFullHealth() const;
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	float Health;
