@@ -19,25 +19,29 @@ USInteractComponent::USInteractComponent()
 }
 
 void USInteractComponent::PrimaryInteract() const
-{
+{	
+	APawn* OwnerPawn = GetOwner<APawn>();
+	if (!OwnerPawn)
+	{
+		return;
+	}
+
 	TArray<FHitResult> Hits;
-	FVector EyesLocation;
-	FRotator EyesRotation;
-	GetOwner()->GetActorEyesViewPoint(EyesLocation, EyesRotation);
-	FVector TraceEnd = EyesLocation + EyesRotation.Vector() * InteractionRange;
 	FCollisionObjectQueryParams ObjectQueryParams;
 	ObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldDynamic);
-	
 	FCollisionShape CollisionShape = FCollisionShape::MakeSphere(InteractionSphereRadius);
-	
-	GetWorld()->SweepMultiByObjectType(Hits, EyesLocation, TraceEnd, FQuat::Identity, ObjectQueryParams, CollisionShape);
-	DrawDebugLine(GetWorld(), EyesLocation, TraceEnd, FColor::Blue, false, 2.f, 0, 2.f);
+	FVector ViewPoint;
+	FRotator ViewRotation;
+	OwnerPawn->GetController()->GetPlayerViewPoint(ViewPoint, ViewRotation);
+	FVector SweepEnd = ViewPoint + ViewRotation.Vector() * InteractionRange * 2;
+	GetWorld()->SweepMultiByObjectType(Hits, ViewPoint, SweepEnd, FQuat::Identity, ObjectQueryParams, CollisionShape);
+	DrawDebugLine(GetWorld(), ViewPoint, SweepEnd, FColor::Blue, false, 2.f, 0, 2.f);
 	
 	for (FHitResult Hit : Hits)
 	{
 		AActor* HitActor = Hit.GetActor();
 		APawn* InstigatorPawn = Cast<APawn>(GetOwner());
-		if (HitActor->Implements<USGameplayInterface>() && InstigatorPawn)
+		if (HitActor->Implements<USGameplayInterface>() && InstigatorPawn && OwnerPawn->GetDistanceTo(HitActor) <= InteractionRange)
 		{
 			ISGameplayInterface::Execute_Interact(HitActor, InstigatorPawn);
 
