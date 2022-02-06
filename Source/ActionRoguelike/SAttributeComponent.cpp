@@ -20,8 +20,10 @@ void USAttributeComponent::BeginPlay()
 
 bool USAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Delta)
 {
+	float HealthBefore = Health;
 	Health += Delta;
 	Health = FMath::Clamp(Health, 0.f, HealthMax);
+	float ActualDelta = Health - HealthBefore;
 	OnHealthChanged.Broadcast(this, InstigatorActor, Health, Delta);
 	return true;
 }

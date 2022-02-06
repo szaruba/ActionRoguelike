@@ -32,6 +32,11 @@ protected:
 
 	UFUNCTION()
 	void OnSeePawn(APawn* SeenPawn);
+	UFUNCTION()
+	void HandleHealthChanged(USAttributeComponent* OwningComp, AActor* InstigatorActor, float HealthNew, float HealthDelta);
+
+	UFUNCTION(BlueprintPure)
+	bool IsAlive() const;
 
 public:
 	// Called every frame

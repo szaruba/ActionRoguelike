@@ -29,6 +29,7 @@ void ASAICharacter::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	PawnSensingComp->OnSeePawn.AddDynamic(this, &ASAICharacter::OnSeePawn);
+	AttributeComp->OnHealthChanged.AddDynamic(this, &ASAICharacter::HandleHealthChanged);
 }
 
 void ASAICharacter::OnSeePawn(APawn* SeenPawn)
@@ -39,6 +40,26 @@ void ASAICharacter::OnSeePawn(APawn* SeenPawn)
 		UBlackboardComponent* BBComp = AIController->GetBlackboardComponent();
 		BBComp->SetValueAsObject("TargetActor", SeenPawn);
 	}
+}
+
+void ASAICharacter::HandleHealthChanged(USAttributeComponent* OwningComp, AActor* InstigatorActor, float HealthNew, float HealthDelta)
+{
+	if (HealthNew <= 0.f)
+	{
+		AAIController* AIController = Cast<AAIController>(GetController());
+		if (AIController)
+		{
+			AIController->GetBrainComponent()->StopLogic("Killed");
+			GetMesh()->SetAllBodiesSimulatePhysics(true);
+			GetMesh()->SetCollisionProfileName("Ragdoll");
+			SetLifeSpan(5.f);
+		}
+	}
+}
+
+bool ASAICharacter::IsAlive() const
+{
+	return AttributeComp->IsAlive();
 }
 
 // Called every frame
