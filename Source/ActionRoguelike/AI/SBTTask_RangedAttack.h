@@ -15,6 +15,8 @@ class ACTIONROGUELIKE_API USBTTask_RangedAttack : public UBTTaskNode
 {
 	GENERATED_BODY()
 
+	USBTTask_RangedAttack();
+	
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
 protected:
@@ -23,4 +25,7 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<ASProjectile> ProjectileClass;
+
+	UPROPERTY(EditAnywhere)
+	float BulletSpreadHalfAngle;
 };

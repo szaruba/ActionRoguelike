@@ -6,6 +6,11 @@
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
+USBTTask_RangedAttack::USBTTask_RangedAttack()
+{
+	BulletSpreadHalfAngle = 3.0f;
+}
+
 EBTNodeResult::Type USBTTask_RangedAttack::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	UBlackboardComponent* BB = OwnerComp.GetBlackboardComponent();
@@ -24,6 +29,8 @@ EBTNodeResult::Type USBTTask_RangedAttack::ExecuteTask(UBehaviorTreeComponent& O
 
 		FVector MuzzleLocation = AIPawn->GetActorLocation();
 		FRotator SpawnRotation = (TargetActor->GetActorLocation() - MuzzleLocation).Rotation();
+		SpawnRotation.Pitch += FMath::RandRange(0.f, BulletSpreadHalfAngle);
+		SpawnRotation.Yaw += FMath::RandRange(-BulletSpreadHalfAngle, BulletSpreadHalfAngle);
 		GetWorld()->SpawnActor<ASProjectile>(ProjectileClass, MuzzleLocation, SpawnRotation, SpawnParams);
 		return EBTNodeResult::Succeeded;
 	}
