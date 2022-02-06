@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AI/SBTService_CheckHealth.h"
 #include "Components/ActorComponent.h"
 #include "SAttributeComponent.generated.h"
 
@@ -34,10 +35,12 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	bool IsFullHealth() const;
+	UFUNCTION(BlueprintPure)
+	float GetHealth() const;
 
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float Health;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float HealthMax;
 };

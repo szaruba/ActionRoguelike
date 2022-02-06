@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ActionRoguelike/SAttributeComponent.h"
 #include "GameFramework/Actor.h"
 #include "GameFramework/Character.h"
 #include "Perception/PawnSensingComponent.h"
@@ -20,6 +21,9 @@ public:
 protected:
 	UPROPERTY(EditAnywhere)
 	UPawnSensingComponent* PawnSensingComp;
+
+	UPROPERTY(EditAnywhere)
+	USAttributeComponent* AttributeComp;
 	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
