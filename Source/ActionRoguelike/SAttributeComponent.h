@@ -16,6 +16,12 @@ class ACTIONROGUELIKE_API USAttributeComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
+	UFUNCTION(BlueprintPure)
+	static USAttributeComponent* GetAttributes(AActor* OfActor);
+
+	UFUNCTION(BlueprintPure)
+	static bool IsActorAlive(AActor* Actor);
+	
 	// Sets default values for this component's properties
 	USAttributeComponent();
 

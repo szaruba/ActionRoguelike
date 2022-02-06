@@ -43,3 +43,23 @@ float USAttributeComponent::GetHealth() const
 	return Health;
 }
 
+USAttributeComponent* USAttributeComponent::GetAttributes(AActor* OfActor)
+{
+	if(OfActor)
+	{
+		return Cast<USAttributeComponent>(OfActor->GetComponentByClass(USAttributeComponent::StaticClass()));
+	}
+
+	return nullptr;
+}
+
+bool USAttributeComponent::IsActorAlive(AActor* Actor)
+{
+	USAttributeComponent* AttrComp = GetAttributes(Actor);
+	if (AttrComp)
+	{
+		return AttrComp->IsAlive();
+	}
+	return false;
+}
+

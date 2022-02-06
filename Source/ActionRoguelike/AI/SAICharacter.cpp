@@ -32,18 +32,28 @@ void ASAICharacter::PostInitializeComponents()
 	AttributeComp->OnHealthChanged.AddDynamic(this, &ASAICharacter::HandleHealthChanged);
 }
 
-void ASAICharacter::OnSeePawn(APawn* SeenPawn)
+void ASAICharacter::SetTargetActor(AActor* TargetActor)
 {
 	AAIController* AIController = Cast<AAIController>(GetController());
 	if (AIController)
 	{
 		UBlackboardComponent* BBComp = AIController->GetBlackboardComponent();
-		BBComp->SetValueAsObject("TargetActor", SeenPawn);
+		BBComp->SetValueAsObject("TargetActor", TargetActor);
 	}
+}
+
+void ASAICharacter::OnSeePawn(APawn* SeenPawn)
+{
+	SetTargetActor(SeenPawn);
 }
 
 void ASAICharacter::HandleHealthChanged(USAttributeComponent* OwningComp, AActor* InstigatorActor, float HealthNew, float HealthDelta)
 {
+	if (HealthDelta < 0.f)
+	{
+		SetTargetActor(InstigatorActor);
+	}
+	
 	if (HealthNew <= 0.f)
 	{
 		AAIController* AIController = Cast<AAIController>(GetController());

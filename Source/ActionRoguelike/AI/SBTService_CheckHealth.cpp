@@ -19,7 +19,7 @@ void USBTService_CheckHealth::TickNode(UBehaviorTreeComponent& OwnerComp, uint8*
 	APawn* OwnerPawn = OwnerComp.GetAIOwner()->GetPawn();
 	if (OwnerPawn)
 	{
-		USAttributeComponent* AttributeComponent = Cast<USAttributeComponent>(OwnerPawn->GetComponentByClass(USAttributeComponent::StaticClass()));
+		USAttributeComponent* AttributeComponent = USAttributeComponent::GetAttributes(OwnerPawn);
 		if (ensureMsgf(AttributeComponent, TEXT("Assign an USAttributeComponent to the AIPawn!")))
 		{
 			bool bHasLowHealth = AttributeComponent->GetHealth() <= LowHealthThreshold;

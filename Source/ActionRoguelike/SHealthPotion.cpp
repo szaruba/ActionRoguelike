@@ -32,7 +32,7 @@ void ASHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 {
 	if (InstigatorPawn)
 	{
-		USAttributeComponent* AttrComp = Cast<USAttributeComponent>(InstigatorPawn->GetComponentByClass(USAttributeComponent::StaticClass()));
+		USAttributeComponent* AttrComp = USAttributeComponent::GetAttributes(InstigatorPawn);
 		if (AttrComp && !AttrComp->IsFullHealth())
 		{
 			AttrComp->ApplyHealthChange(this, HealAmount);

@@ -41,7 +41,7 @@ void ASMagicProjectile::HandleOnOverlap(UPrimitiveComponent* OverlappedComponent
 {
 	if (OtherActor && OtherActor != GetInstigator())
 	{
-		USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(OtherActor->GetComponentByClass(USAttributeComponent::StaticClass()));
+		USAttributeComponent* AttributeComp = USAttributeComponent::GetAttributes(OtherActor);
 		if (AttributeComp)
 		{
 			AttributeComp->ApplyHealthChange(GetInstigator(), -Damage);
@@ -56,7 +56,7 @@ void ASMagicProjectile::HandleOnActorHit(UPrimitiveComponent* HitComponent, AAct
 {
 	if (OtherActor && OtherActor != GetInstigator())
 	{
-		USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(OtherActor->GetComponentByClass(USAttributeComponent::StaticClass()));
+		USAttributeComponent* AttributeComp = USAttributeComponent::GetAttributes(OtherActor);
 		if (AttributeComp)
 		{
 			AttributeComp->ApplyHealthChange(GetInstigator(), -Damage);

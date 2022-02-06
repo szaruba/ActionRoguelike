@@ -29,6 +29,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	virtual void PostInitializeComponents() override;
+	void SetTargetActor(AActor* TargetActor);
 
 	UFUNCTION()
 	void OnSeePawn(APawn* SeenPawn);
