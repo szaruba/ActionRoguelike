@@ -4,7 +4,9 @@
 #include "SAICharacter.h"
 
 #include "AIController.h"
+#include "ActionRoguelike/SWorldUserWidget.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Blueprint/UserWidget.h"
 
 
 // Sets default values
@@ -15,6 +17,8 @@ ASAICharacter::ASAICharacter()
 
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComp");
 	AttributeComp = CreateDefaultSubobject<USAttributeComponent>("AttributeComp");
+
+	HitFlashMaterial_TimeOfHitParam = "TimeOfHit";
 }
 
 // Called when the game starts or when spawned
@@ -52,6 +56,14 @@ void ASAICharacter::HandleHealthChanged(USAttributeComponent* OwningComp, AActor
 	if (HealthDelta < 0.f)
 	{
 		SetTargetActor(InstigatorActor);
+		GetMesh()->SetScalarParameterValueOnMaterials(HitFlashMaterial_TimeOfHitParam, GetWorld()->GetTimeSeconds());
+
+		if (!HealthBarWidget && ensure(HealthBarWidgetClass))
+		{
+			HealthBarWidget = CreateWidget<USWorldUserWidget>(GetWorld(), HealthBarWidgetClass);
+			HealthBarWidget->AttachedActor = this;
+			HealthBarWidget->AddToViewport();
+		}
 	}
 	
 	if (HealthNew <= 0.f)

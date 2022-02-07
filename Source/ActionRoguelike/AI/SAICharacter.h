@@ -9,6 +9,7 @@
 #include "Perception/PawnSensingComponent.h"
 #include "SAICharacter.generated.h"
 
+class USWorldUserWidget;
 UCLASS()
 class ACTIONROGUELIKE_API ASAICharacter : public ACharacter
 {
@@ -24,6 +25,14 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	USAttributeComponent* AttributeComp;
+
+	UPROPERTY(VisibleAnywhere)
+	FName HitFlashMaterial_TimeOfHitParam;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<USWorldUserWidget> HealthBarWidgetClass;
+	UPROPERTY()
+	USWorldUserWidget* HealthBarWidget;
 	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
