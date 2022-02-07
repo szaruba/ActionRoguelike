@@ -58,7 +58,7 @@ void ASAICharacter::HandleHealthChanged(USAttributeComponent* OwningComp, AActor
 		SetTargetActor(InstigatorActor);
 		GetMesh()->SetScalarParameterValueOnMaterials(HitFlashMaterial_TimeOfHitParam, GetWorld()->GetTimeSeconds());
 
-		if (!HealthBarWidget && ensure(HealthBarWidgetClass))
+		if (!HealthBarWidget && ensure(HealthBarWidgetClass) && IsAlive())
 		{
 			HealthBarWidget = CreateWidget<USWorldUserWidget>(GetWorld(), HealthBarWidgetClass);
 			HealthBarWidget->AttachedActor = this;

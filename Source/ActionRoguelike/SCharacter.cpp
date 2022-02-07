@@ -31,6 +31,11 @@ ASCharacter::ASCharacter()
 	bUseControllerRotationYaw = false;
 }
 
+void ASCharacter::Heal(float Amount)
+{
+	AttributeComp->ApplyHealthChange(this, Amount);
+}
+
 void ASCharacter::MoveForward(float value)
 {
 	FRotator ControlRot = GetControlRotation();

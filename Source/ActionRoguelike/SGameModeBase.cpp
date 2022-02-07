@@ -11,6 +11,15 @@ ASGameModeBase::ASGameModeBase()
 	BotSpawnRate = 5.f;
 }
 
+void ASGameModeBase::KillAll()
+{
+	for (ASAICharacter* AICharacter : TActorRange<ASAICharacter>(GetWorld()))
+	{
+		USAttributeComponent* AttributeComponent = USAttributeComponent::GetAttributes(AICharacter);
+		AttributeComponent->ApplyHealthChange(this, -AttributeComponent->GetHealthMax()); // @Fixme: set instigator actor to issuing player of KillAll command
+	}
+}
+
 void ASGameModeBase::StartPlay()
 {
 	Super::StartPlay();

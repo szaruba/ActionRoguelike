@@ -19,6 +19,9 @@ class ACTIONROGUELIKE_API ASGameModeBase : public AGameModeBase
 
 public:
 	ASGameModeBase();
+
+	UFUNCTION(Exec)
+	void KillAll();
 	
 protected:
 

@@ -43,6 +43,8 @@ public:
 	bool IsFullHealth() const;
 	UFUNCTION(BlueprintPure)
 	float GetHealth() const;
+	UFUNCTION(BlueprintPure)
+	float GetHealthMax() const;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
