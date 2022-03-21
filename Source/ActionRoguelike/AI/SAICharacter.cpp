@@ -16,7 +16,6 @@ ASAICharacter::ASAICharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComp");
-	AttributeComp = CreateDefaultSubobject<USAttributeComponent>("AttributeComp");
 
 	HitFlashMaterial_TimeOfHitParam = "TimeOfHit";
 }
@@ -25,7 +24,6 @@ ASAICharacter::ASAICharacter()
 void ASAICharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 void ASAICharacter::PostInitializeComponents()
@@ -33,7 +31,6 @@ void ASAICharacter::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	PawnSensingComp->OnSeePawn.AddDynamic(this, &ASAICharacter::OnSeePawn);
-	AttributeComp->OnHealthChanged.AddDynamic(this, &ASAICharacter::HandleHealthChanged);
 }
 
 void ASAICharacter::SetTargetActor(AActor* TargetActor)
@@ -72,16 +69,8 @@ void ASAICharacter::HandleHealthChanged(USAttributeComponent* OwningComp, AActor
 		if (AIController)
 		{
 			AIController->GetBrainComponent()->StopLogic("Killed");
-			GetMesh()->SetAllBodiesSimulatePhysics(true);
-			GetMesh()->SetCollisionProfileName("Ragdoll");
-			SetLifeSpan(5.f);
 		}
 	}
-}
-
-bool ASAICharacter::IsAlive() const
-{
-	return AttributeComp->IsAlive();
 }
 
 // Called every frame

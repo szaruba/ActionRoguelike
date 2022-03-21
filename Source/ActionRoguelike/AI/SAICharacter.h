@@ -4,14 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "ActionRoguelike/SAttributeComponent.h"
+#include "ActionRoguelike/SCharacterBase.h"
 #include "GameFramework/Actor.h"
 #include "GameFramework/Character.h"
 #include "Perception/PawnSensingComponent.h"
 #include "SAICharacter.generated.h"
 
+
 class USWorldUserWidget;
 UCLASS()
-class ACTIONROGUELIKE_API ASAICharacter : public ACharacter
+class ACTIONROGUELIKE_API ASAICharacter : public ASCharacterBase
 {
 	GENERATED_BODY()
 
@@ -22,9 +24,6 @@ public:
 protected:
 	UPROPERTY(EditAnywhere)
 	UPawnSensingComponent* PawnSensingComp;
-
-	UPROPERTY(EditAnywhere)
-	USAttributeComponent* AttributeComp;
 
 	UPROPERTY(VisibleAnywhere)
 	FName HitFlashMaterial_TimeOfHitParam;
@@ -42,13 +41,10 @@ protected:
 
 	UFUNCTION()
 	void OnSeePawn(APawn* SeenPawn);
-	UFUNCTION()
-	void HandleHealthChanged(USAttributeComponent* OwningComp, AActor* InstigatorActor, float HealthNew, float HealthDelta);
+	
+	virtual void HandleHealthChanged(USAttributeComponent* OwningComp, AActor* InstigatorActor, float HealthNew, float HealthDelta) override;
 
-	UFUNCTION(BlueprintPure)
-	bool IsAlive() const;
-
-public:
+public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 };

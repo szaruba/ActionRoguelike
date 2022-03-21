@@ -29,7 +29,7 @@ bool USAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Delt
 	Health += Delta;
 	Health = FMath::Clamp(Health, 0.f, HealthMax);
 	float ActualDelta = Health - HealthBefore;
-	OnHealthChanged.Broadcast(this, InstigatorActor, Health, Delta);
+	OnHealthChanged.Broadcast(this, InstigatorActor, Health, ActualDelta);
 	return true;
 }
 

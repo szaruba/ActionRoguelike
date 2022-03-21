@@ -25,8 +25,6 @@ ASCharacter::ASCharacter()
 
 	InteractComp = CreateDefaultSubobject<USInteractComponent>("InteractComp");
 
-	AttributeComp = CreateDefaultSubobject<USAttributeComponent>("AttributeComp");
-
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationYaw = false;
 }
@@ -34,6 +32,19 @@ ASCharacter::ASCharacter()
 void ASCharacter::Heal(float Amount)
 {
 	AttributeComp->ApplyHealthChange(this, Amount);
+}
+
+void ASCharacter::Kill(AActor* Target)
+{
+	if (!Target)
+	{
+		Target = this;
+	}
+	USAttributeComponent* Attributes = USAttributeComponent::GetAttributes(Target);
+	if (Attributes)
+	{
+		Attributes->ApplyHealthChange(this, -Attributes->GetHealthMax());
+	}
 }
 
 void ASCharacter::MoveForward(float value)
@@ -89,10 +100,15 @@ void ASCharacter::SpawnProjectile(TSubclassOf<AActor> ProjectileClass)
 		return;
 	}
 	
+	AController* PlayerController = GetController();
+	if (!PlayerController)
+	{
+		return;
+	}
 	FHitResult Hit;
 	FVector CameraLocation;
 	FRotator CameraRot;
-	GetController()->GetPlayerViewPoint(CameraLocation, CameraRot);
+	PlayerController->GetPlayerViewPoint(CameraLocation, CameraRot);
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(this);
 	FVector TraceEnd = CameraLocation + 100000 * CameraRot.Vector();
@@ -122,9 +138,11 @@ void ASCharacter::Teleport()
 	GetWorldTimerManager().SetTimer(TimerHandle, TimerDelegate, 0.2f, false);
 }
 
-void ASCharacter::OnHealthChanged(USAttributeComponent* OwningComp, AActor* InstigatorActor, float HealthNew,
+void ASCharacter::HandleHealthChanged(USAttributeComponent* OwningComp, AActor* InstigatorActor, float HealthNew,
 	float HealthDelta)
 {
+	Super::HandleHealthChanged(OwningComp, InstigatorActor, HealthNew, HealthDelta);
+	
 	if (HealthDelta < 0.f)
 	{
 		// hit flash
@@ -135,12 +153,6 @@ void ASCharacter::OnHealthChanged(USAttributeComponent* OwningComp, AActor* Inst
 	{
 		DisableInput(Cast<APlayerController>(GetController()));
 	}
-}
-
-void ASCharacter::PostInitializeComponents()
-{
-	Super::PostInitializeComponents();
-	AttributeComp->OnHealthChanged.AddDynamic(this, &ASCharacter::OnHealthChanged);
 }
 
 // Called every frame

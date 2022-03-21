@@ -22,7 +22,9 @@ public:
 
 	UFUNCTION(Exec)
 	void KillAll();
-	
+
+	UFUNCTION()
+	void HandlePawnKilled(APawn* KilledPawn, APawn* InstigatorPawn);
 protected:
 
 	UPROPERTY(EditAnywhere)
@@ -40,6 +42,14 @@ protected:
 
 	UFUNCTION()
 	void RunSpawnBotQuery();
+	void RespawnPlayer(APlayerController* PlayerController);
+	void DisposeCorpse(APawn* KilledPawn);
+
+	void TestFunction1();
+	bool TestFunction2();
+	void TestFunction3(float Value);
+	bool TestFunction4(float Value);
+	
 
 private:
 	UFUNCTION()

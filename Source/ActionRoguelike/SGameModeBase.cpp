@@ -45,13 +45,59 @@ void ASGameModeBase::RunSpawnBotQuery()
 	}
 }
 
+void ASGameModeBase::HandlePawnKilled(APawn* KilledPawn, APawn* InstigatorPawn)
+{
+	AController* PawnController = KilledPawn->GetController();
+
+	if (APlayerController* PlayerController = Cast<APlayerController>(PawnController))
+	{
+		RespawnPlayer(PlayerController);
+	}
+	
+	DisposeCorpse(KilledPawn);
+}
+
+void ASGameModeBase::RespawnPlayer(APlayerController* PlayerController)
+{
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle, [this, PlayerController]()
+	{
+		PlayerController->UnPossess();
+		RestartPlayer(PlayerController);
+	}, 3.0f, false);
+}
+
+void ASGameModeBase::DisposeCorpse(APawn* KilledPawn)
+{
+	FTimerHandle TimerHanlde;
+	FTimerDelegate TimerDelegate;
+
+	GetWorldTimerManager().SetTimer(TimerHanlde, TimerDelegate, 5.0f, false);
+	TimerDelegate.BindLambda([KilledPawn]()
+	{
+		if (KilledPawn)
+		{
+			KilledPawn->Destroy();
+		}
+	});
+}
+
 void ASGameModeBase::HandleSpawnBotQueryFinished(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus)
 {
 	TArray<FVector> BotSpawnLocations = QueryInstance->GetResultsAsLocations();
 	if (QueryStatus == EEnvQueryStatus::Type::Success && BotSpawnLocations.IsValidIndex(0))
 	{
 		FVector SpawnLocation = BotSpawnLocations[0];
-		GetWorld()->SpawnActor(BotCharacterClass, &SpawnLocation);
+		ASAICharacter* AICharacter = GetWorld()->SpawnActor<ASAICharacter>(BotCharacterClass, SpawnLocation, FRotator::ZeroRotator);
+
+		// Handled in ASCharacterBase for both Player and Bots
+		// AICharacter->OnPawnDied.AddLambda([this, AICharacter](AActor* InstigatorActor)
+		// {
+		// 	if (this)
+		// 	{
+		// 		this->HandlePawnKilled(AICharacter, Cast<APawn>(InstigatorActor));
+		// 	}
+		// });
 	}
 
 }

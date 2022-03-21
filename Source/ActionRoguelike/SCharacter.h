@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "SAttributeComponent.h"
+#include "SCharacterBase.h"
 #include "GameFramework/Character.h"
 #include "SCharacter.generated.h"
 
@@ -13,7 +14,7 @@ class UCameraComponent;
 class UAnimMontage;
 
 UCLASS()
-class ACTIONROGUELIKE_API ASCharacter : public ACharacter
+class ACTIONROGUELIKE_API ASCharacter : public ASCharacterBase
 {
 	GENERATED_BODY()
 
@@ -23,6 +24,9 @@ public:
 
 	UFUNCTION(Exec)
 	void Heal(float Amount = 100.0f);
+
+	UFUNCTION(Exec)
+	void Kill(AActor* Target = nullptr);
 
 protected:
 	UPROPERTY(VisibleAnywhere)
@@ -40,8 +44,6 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere)
 	USInteractComponent* InteractComp;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	USAttributeComponent* AttributeComp;
 
 	UPROPERTY(EditAnywhere, Category="Animation")
 	UAnimMontage* PrimaryAttackAnim;
@@ -59,11 +61,8 @@ protected:
 	void SpawnProjectile(TSubclassOf<AActor> ProjectileClass);
 	void PrimaryInteract();
 	void Teleport();
-
-	UFUNCTION()
-	void OnHealthChanged(USAttributeComponent* OwningComp, AActor* InstigatorActor, float HealthNew, float HealthDelta);
-
-	virtual void PostInitializeComponents() override;
+	
+	virtual void HandleHealthChanged(USAttributeComponent* OwningComp, AActor* InstigatorActor, float HealthNew, float HealthDelta) override;
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
