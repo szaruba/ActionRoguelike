@@ -28,6 +28,9 @@ public:
 	UFUNCTION(Exec)
 	void Kill(AActor* Target = nullptr);
 
+	UFUNCTION(Exec)
+	void God(bool bEnabled = true);
+
 protected:
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArmComp;

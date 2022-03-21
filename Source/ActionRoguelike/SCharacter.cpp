@@ -47,6 +47,11 @@ void ASCharacter::Kill(AActor* Target)
 	}
 }
 
+void ASCharacter::God(bool bEnabled)
+{
+	SetCanBeDamaged(!bEnabled);
+}
+
 void ASCharacter::MoveForward(float value)
 {
 	FRotator ControlRot = GetControlRotation();

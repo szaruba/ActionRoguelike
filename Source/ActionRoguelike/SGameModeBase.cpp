@@ -6,6 +6,8 @@
 #include "EngineUtils.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
 
+static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("su.SpawnBots"), true, TEXT("Enable/Disable bot spawning"), ECVF_Cheat);
+
 ASGameModeBase::ASGameModeBase()
 {
 	BotSpawnRate = 5.f;
@@ -30,6 +32,12 @@ void ASGameModeBase::StartPlay()
 
 void ASGameModeBase::RunSpawnBotQuery()
 {
+	if(!CVarSpawnBots.GetValueOnGameThread())
+	{
+		UE_LOG(LogTemp, Display, TEXT("Bot is not spawned because su.SpawnBots = 0"));
+		return;
+	}
+
 	int BotCount = 0;
 	for (TActorIterator<ASAICharacter> It(GetWorld()); It; ++It)
 	{

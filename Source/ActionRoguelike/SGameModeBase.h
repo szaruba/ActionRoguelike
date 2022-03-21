@@ -8,6 +8,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "SGameModeBase.generated.h"
 
+
 class UEnvQueryInstanceBlueprintWrapper;
 /**
  * 
