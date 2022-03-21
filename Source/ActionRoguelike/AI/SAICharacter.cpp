@@ -50,6 +50,8 @@ void ASAICharacter::OnSeePawn(APawn* SeenPawn)
 
 void ASAICharacter::HandleHealthChanged(USAttributeComponent* OwningComp, AActor* InstigatorActor, float HealthNew, float HealthDelta)
 {
+	Super::HandleHealthChanged(OwningComp, InstigatorActor, HealthNew, HealthDelta);
+	
 	if (HealthDelta < 0.f)
 	{
 		SetTargetActor(InstigatorActor);

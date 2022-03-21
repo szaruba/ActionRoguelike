@@ -5,6 +5,8 @@
 
 #include "SAttributeComponent.h"
 #include "SGameModeBase.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 
 // Sets default values
@@ -14,6 +16,9 @@ ASCharacterBase::ASCharacterBase()
 	PrimaryActorTick.bCanEverTick = true;
 
 	AttributeComp = CreateDefaultSubobject<USAttributeComponent>("AttributeComp");
+
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Ignore);
+	GetMesh()->SetGenerateOverlapEvents(true);
 }
 
 // Called when the game starts or when spawned
@@ -42,6 +47,9 @@ void ASCharacterBase::HandleHealthChanged(USAttributeComponent* OwningComp, AAct
 	{
 		OnPawnDied.Broadcast(InstigatorActor);
 
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		GetCharacterMovement()->DisableMovement();
+		
 		GetMesh()->SetAllBodiesSimulatePhysics(true);
 		GetMesh()->SetCollisionProfileName("Ragdoll");
 		SetLifeSpan(5.f);

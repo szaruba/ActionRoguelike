@@ -5,6 +5,7 @@
 
 #include "DrawDebugHelpers.h"
 #include "SAttributeComponent.h"
+#include "SGameplayFunctionLibrary.h"
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
@@ -41,13 +42,10 @@ void ASMagicProjectile::HandleOnOverlap(UPrimitiveComponent* OverlappedComponent
 {
 	if (OtherActor && OtherActor != GetInstigator())
 	{
-		USAttributeComponent* AttributeComp = USAttributeComponent::GetAttributes(OtherActor);
-		if (AttributeComp)
+		if(USGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(), OtherActor, Damage, SweepResult))
 		{
-			AttributeComp->ApplyHealthChange(GetInstigator(), -Damage);
+			Explode();
 		}
-
-		Explode();
 	}
 }
 
@@ -56,13 +54,10 @@ void ASMagicProjectile::HandleOnActorHit(UPrimitiveComponent* HitComponent, AAct
 {
 	if (OtherActor && OtherActor != GetInstigator())
 	{
-		USAttributeComponent* AttributeComp = USAttributeComponent::GetAttributes(OtherActor);
-		if (AttributeComp)
+		if(USGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(), OtherActor, Damage, Hit))
 		{
-			AttributeComp->ApplyHealthChange(GetInstigator(), -Damage);
+			Explode();
 		}
-
-		Explode();
 	}
 }
 
