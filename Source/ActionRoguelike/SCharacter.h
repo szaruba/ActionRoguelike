@@ -64,6 +64,8 @@ protected:
 	void SpawnProjectile(TSubclassOf<AActor> ProjectileClass);
 	void PrimaryInteract();
 	void Teleport();
+	void StartSprint();
+	void StopSprint();
 	
 	virtual void HandleHealthChanged(USAttributeComponent* OwningComp, AActor* InstigatorActor, float HealthNew, float HealthDelta) override;
 public:

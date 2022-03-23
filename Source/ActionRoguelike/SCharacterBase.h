@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SActionComponent.h"
 #include "GameFramework/Character.h"
 #include "SCharacterBase.generated.h"
 
@@ -24,6 +25,9 @@ public:
 protected:
 	UPROPERTY(EditAnywhere)
 	USAttributeComponent* AttributeComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	USActionComponent* ActionComp;
 	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

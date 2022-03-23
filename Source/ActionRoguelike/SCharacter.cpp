@@ -74,7 +74,6 @@ void ASCharacter::MoveRight(float value)
 void ASCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 void ASCharacter::PrimaryAttack()
@@ -144,7 +143,7 @@ void ASCharacter::Teleport()
 }
 
 void ASCharacter::HandleHealthChanged(USAttributeComponent* OwningComp, AActor* InstigatorActor, float HealthNew,
-	float HealthDelta)
+                                      float HealthDelta)
 {
 	Super::HandleHealthChanged(OwningComp, InstigatorActor, HealthNew, HealthDelta);
 	
@@ -161,12 +160,14 @@ void ASCharacter::HandleHealthChanged(USAttributeComponent* OwningComp, AActor* 
 }
 
 // Called every frame
+
 void ASCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
 
 // Called to bind functionality to input
+
 void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -180,5 +181,18 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction("PrimaryInteract", EInputEvent::IE_Pressed, this, &ASCharacter::PrimaryInteract);
 	PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Teleport", IE_Pressed, this, &ASCharacter::Teleport);
+
+	PlayerInputComponent->BindAction("Sprint", EInputEvent::IE_Pressed, this, &ASCharacter::StartSprint);
+	PlayerInputComponent->BindAction("Sprint", EInputEvent::IE_Released, this, &ASCharacter::StopSprint);
+}
+
+void ASCharacter::StartSprint()
+{
+	ActionComp->StartActionByName(this, "Sprint");
+}
+
+void ASCharacter::StopSprint()
+{
+	ActionComp->StopActionByName(this, "Sprint");
 }
 

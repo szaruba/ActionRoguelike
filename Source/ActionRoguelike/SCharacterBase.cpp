@@ -16,6 +16,7 @@ ASCharacterBase::ASCharacterBase()
 	PrimaryActorTick.bCanEverTick = true;
 
 	AttributeComp = CreateDefaultSubobject<USAttributeComponent>("AttributeComp");
+	ActionComp = CreateDefaultSubobject<USActionComponent>("ActionComp");
 
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Ignore);
 	GetMesh()->SetGenerateOverlapEvents(true);
