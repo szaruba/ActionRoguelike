@@ -37,9 +37,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* CameraComp;
-
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<AActor> ProjectileClassPrimary;
+	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AActor> ProjectileClassSecondary;
 	UPROPERTY(EditAnywhere)
@@ -48,10 +46,10 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	USInteractComponent* InteractComp;
 
-	UPROPERTY(EditAnywhere, Category="Animation")
-	UAnimMontage* PrimaryAttackAnim;
 	UPROPERTY(EditAnywhere)
-	UParticleSystem* PrimaryAttack_Particles;
+	TArray<TSubclassOf<USAction>> DefaultActions;
+
+
 
 	void MoveForward(float value);
 	void MoveRight(float value);
@@ -61,7 +59,7 @@ protected:
 
 	void PrimaryAttack();
 	void SecondaryAttack();
-	void SpawnProjectile(TSubclassOf<AActor> ProjectileClass);
+
 	void PrimaryInteract();
 	void Teleport();
 	void StartSprint();

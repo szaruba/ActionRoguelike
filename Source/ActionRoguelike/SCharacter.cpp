@@ -74,59 +74,21 @@ void ASCharacter::MoveRight(float value)
 void ASCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	for (const TSubclassOf<USAction> DefaultAction : DefaultActions)
+	{
+		ActionComp->AddAction(DefaultAction);
+	}
 }
 
 void ASCharacter::PrimaryAttack()
 {
-	UGameplayStatics::SpawnEmitterAttached(PrimaryAttack_Particles, GetMesh(), "Muzzle_01");
-	PlayAnimMontage(PrimaryAttackAnim);
-
-	FTimerHandle TimerHandle_PrimaryAttack;
-	FTimerDelegate TimerDelegate;
-	TimerDelegate.BindUObject(this, &ASCharacter::SpawnProjectile, ProjectileClassPrimary);
-	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, TimerDelegate, 0.2f, false);	
+	ActionComp->StartActionByName(this, "PrimaryAttack");
 }
 
 void ASCharacter::SecondaryAttack()
 {
-	PlayAnimMontage(PrimaryAttackAnim);
-	
-	FTimerDelegate TimerDelegate;
-	FTimerHandle TimerHandle;
-	TimerDelegate.BindUObject(this, &ASCharacter::SpawnProjectile, ProjectileClassSecondary);
-	GetWorldTimerManager().SetTimer(TimerHandle, TimerDelegate, 0.2f, false);	
-}
-
-void ASCharacter::SpawnProjectile(TSubclassOf<AActor> ProjectileClass)
-{
-	if (!ensure(ProjectileClass))
-	{
-		return;
-	}
-	
-	AController* PlayerController = GetController();
-	if (!PlayerController)
-	{
-		return;
-	}
-	FHitResult Hit;
-	FVector CameraLocation;
-	FRotator CameraRot;
-	PlayerController->GetPlayerViewPoint(CameraLocation, CameraRot);
-	FCollisionQueryParams QueryParams;
-	QueryParams.AddIgnoredActor(this);
-	FVector TraceEnd = CameraLocation + 100000 * CameraRot.Vector();
-	GetWorld()->LineTraceSingleByObjectType(Hit, CameraLocation, TraceEnd, FCollisionObjectQueryParams::AllObjects, QueryParams);
-
-	FVector HitLocation = Hit.IsValidBlockingHit() ? Hit.Location : TraceEnd;
-
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnParams.Instigator = this;
-	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
-	FRotator ProjectileRot = (HitLocation - HandLocation).Rotation();
-	FTransform SpawnTM = FTransform(ProjectileRot, HandLocation);
-	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
+	ActionComp->StartActionByName(this, "SecondaryAttack");
 }
 
 void ASCharacter::PrimaryInteract()
@@ -136,10 +98,7 @@ void ASCharacter::PrimaryInteract()
 
 void ASCharacter::Teleport()
 {
-	FTimerHandle TimerHandle;
-	FTimerDelegate TimerDelegate;
-	TimerDelegate.BindUObject(this, &ASCharacter::SpawnProjectile, ProjectileClassTeleport);
-	GetWorldTimerManager().SetTimer(TimerHandle, TimerDelegate, 0.2f, false);
+	ActionComp->StartActionByName(this, "Teleport");
 }
 
 void ASCharacter::HandleHealthChanged(USAttributeComponent* OwningComp, AActor* InstigatorActor, float HealthNew,
