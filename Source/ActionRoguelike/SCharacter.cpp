@@ -143,6 +143,13 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 	PlayerInputComponent->BindAction("Sprint", EInputEvent::IE_Pressed, this, &ASCharacter::StartSprint);
 	PlayerInputComponent->BindAction("Sprint", EInputEvent::IE_Released, this, &ASCharacter::StopSprint);
+
+	PlayerInputComponent->BindAction("CancelActions", IE_Pressed, this, &ASCharacter::CancelActions);
+}
+
+void ASCharacter::CancelActions()
+{
+	ActionComp->StopRunningActions(this);
 }
 
 void ASCharacter::StartSprint()

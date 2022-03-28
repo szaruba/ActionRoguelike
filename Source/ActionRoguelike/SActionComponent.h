@@ -29,7 +29,11 @@ public:
 	bool StartActionByName(AActor* Instigator, const FName ActionName);
 	UFUNCTION()
 	bool StopActionByName(AActor* Instigator, const FName ActionName);
-	
+	UFUNCTION()
+	bool StopRunningActions(AActor* Instigator);
+
+	UPROPERTY()
+	FGameplayTagContainer ActiveActionTags;
 
 private:
 	UPROPERTY()

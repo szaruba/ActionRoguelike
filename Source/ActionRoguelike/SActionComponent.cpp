@@ -38,8 +38,14 @@ bool USActionComponent::StartActionByName(AActor* Instigator, const FName Action
 	{
 		if (Action->Name == ActionName)
 		{
-			Action->StartAction(Instigator);
-			return true;
+			if (ActiveActionTags.HasAnyExact(Action->BlockedTags))
+			{
+				UE_LOG(LogTemp, Display, TEXT("Action %s is blocked by an active action"), *GetNameSafe(this));
+				return false;
+			}
+			bool bSuccess;
+			Action->StartAction(Instigator, bSuccess);
+			return bSuccess;
 		}
 	}
 	return false;
@@ -51,10 +57,24 @@ bool USActionComponent::StopActionByName(AActor* Instigator, const FName ActionN
 	{
 		if (Action->Name == ActionName)
 		{
-			Action->StopAction(Instigator);
-			return true;
+			bool bSuccess;
+			Action->StopAction(Instigator, bSuccess);
+			return bSuccess;
 		}
 	}
 	return false;
+}
+
+bool USActionComponent::StopRunningActions(AActor* Instigator)
+{
+	for (USAction* Action : Actions)
+	{
+		if (Action->IsRunning())
+		{
+			bool bSuccess;
+			Action->StopAction(Instigator, bSuccess);
+		}
+	}
+	return true;
 }
 
