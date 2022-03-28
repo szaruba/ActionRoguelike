@@ -14,18 +14,13 @@ USAction_ProjectileAttack::USAction_ProjectileAttack()
 	SpawnDelay = 0.2f;
 }
 
-void USAction_ProjectileAttack::StartAction_Implementation(AActor* ActionInstigator, bool& bOutSuccess)
+void USAction_ProjectileAttack::StartAction_Implementation(AActor* ActionInstigator)
 {
-	Super::StartAction_Implementation(ActionInstigator, bOutSuccess);
-	if (!bOutSuccess)
-	{
-		return;
-	}
+	Super::StartAction_Implementation(ActionInstigator);
 
 	ACharacter* InstigatorCharacter = Cast<ACharacter>(ActionInstigator);
 	if (!InstigatorCharacter)
 	{
-		bOutSuccess = false;
 		return;
 	}
 	
@@ -35,34 +30,27 @@ void USAction_ProjectileAttack::StartAction_Implementation(AActor* ActionInstiga
 	FTimerDelegate TimerDelegate;
 	TimerDelegate.BindUObject(this, &USAction_ProjectileAttack::SpawnProjectile, InstigatorCharacter);
 	InstigatorCharacter->GetWorldTimerManager().SetTimer(TimerHandle_SpawnProjectile, TimerDelegate, SpawnDelay, false);
-	bOutSuccess = true;
 }
 
-void USAction_ProjectileAttack::StopAction_Implementation(AActor* ActionInstigator, bool& bOutSuccess)
+void USAction_ProjectileAttack::StopAction_Implementation(AActor* ActionInstigator)
 {
-	Super::StopAction_Implementation(ActionInstigator, bOutSuccess);
-	if (!bOutSuccess)
-	{
-		return;
-	}
+	Super::StopAction_Implementation(ActionInstigator);
 	
 	ActionInstigator->GetWorldTimerManager().ClearTimer(TimerHandle_SpawnProjectile);
-	bOutSuccess = true;
 }
 
 void USAction_ProjectileAttack::SpawnProjectile(ACharacter* Instigator)
 {
-	bool bSuccess;
 	if (!ensure(ProjectileClass))
 	{
-		StopAction(Instigator, bSuccess);
+		StopAction(Instigator);
 		return;
 	}
 	
 	AController* PlayerController = Instigator->GetController();
 	if (!PlayerController)
 	{
-		StopAction(Instigator, bSuccess);
+		StopAction(Instigator);
 		return;
 	}
 	FHitResult Hit;
@@ -84,5 +72,5 @@ void USAction_ProjectileAttack::SpawnProjectile(ACharacter* Instigator)
 	FTransform SpawnTM = FTransform(ProjectileRot, HandLocation);
 	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
 
-	StopAction(Instigator, bSuccess);
+	StopAction(Instigator);
 }

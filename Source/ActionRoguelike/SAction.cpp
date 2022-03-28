@@ -5,36 +5,33 @@
 
 #include "SActionComponent.h"
 
-void USAction::StartAction_Implementation(AActor* ActionInstigator, bool& bOutSuccess)
+void USAction::StartAction_Implementation(AActor* ActionInstigator)
 {
-	if (!bIsRunning)
-	{
-		UE_LOG(LogTemp, Display, TEXT("Start Action %s"), *GetNameSafe(this));
-		GetOwningComponent()->ActiveActionTags.AppendTags(GrantedTags);
-		bIsRunning = true;
-		bOutSuccess = true;
-	}
-	else
-	{
-		UE_LOG(LogTemp, Display, TEXT("Action %s is already running."), *GetNameSafe(this));
-		bOutSuccess = false;
-	}
+	UE_LOG(LogTemp, Display, TEXT("Start Action %s"), *GetNameSafe(this));
+	GetOwningComponent()->ActiveTags.AppendTags(GrantedTags);
+	bIsRunning = true;
 }
 
-void USAction::StopAction_Implementation(AActor* ActionInstigator, bool& bOutSuccess)
+void USAction::StopAction_Implementation(AActor* ActionInstigator)
+{
+	UE_LOG(LogTemp, Display, TEXT("Stop Action %s"), *GetNameSafe(this));
+	GetOwningComponent()->ActiveTags.RemoveTags(GrantedTags);
+	bIsRunning = false;
+}
+
+bool USAction::CanStart_Implementation(AActor* ActionInstigator) const
 {
 	if (bIsRunning)
 	{
-		UE_LOG(LogTemp, Display, TEXT("Stop Action %s"), *GetNameSafe(this));
-		GetOwningComponent()->ActiveActionTags.RemoveTags(GrantedTags);
-		bIsRunning = false;
-		bOutSuccess = true;
+		return false;
 	}
-	else
+
+	if (!GetOwningComponent() || GetOwningComponent()->ActiveTags.HasAnyExact(BlockedTags))
 	{
-		UE_LOG(LogTemp, Display, TEXT("Action %s was not running"), *GetNameSafe(this));
-		bOutSuccess = false;
+		return false;
 	}
+
+	return true;
 }
 
 USActionComponent* USAction::GetOwningComponent() const

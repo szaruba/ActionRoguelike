@@ -140,11 +140,17 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction("PrimaryInteract", EInputEvent::IE_Pressed, this, &ASCharacter::PrimaryInteract);
 	PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Teleport", IE_Pressed, this, &ASCharacter::Teleport);
+	PlayerInputComponent->BindAction("Parry", IE_Pressed, this, &ASCharacter::Parry);
 
 	PlayerInputComponent->BindAction("Sprint", EInputEvent::IE_Pressed, this, &ASCharacter::StartSprint);
 	PlayerInputComponent->BindAction("Sprint", EInputEvent::IE_Released, this, &ASCharacter::StopSprint);
 
 	PlayerInputComponent->BindAction("CancelActions", IE_Pressed, this, &ASCharacter::CancelActions);
+}
+
+void ASCharacter::Parry()
+{
+	ActionComp->StartActionByName(this, "Parry");
 }
 
 void ASCharacter::CancelActions()

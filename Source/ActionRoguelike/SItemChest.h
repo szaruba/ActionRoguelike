@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "SGameplayInterface.h"
 #include "GameFramework/Actor.h"
 #include "SItemChest.generated.h"
@@ -25,6 +26,10 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	float MaxLidAngle = 110.f;
+
+	/* Required Tags in order to open the chest */
+	UPROPERTY(EditAnywhere)
+	FGameplayTagContainer RequiredTags;
 	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

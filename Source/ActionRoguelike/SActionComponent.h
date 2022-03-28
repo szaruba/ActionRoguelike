@@ -8,6 +8,8 @@
 #include "SActionComponent.generated.h"
 
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTagsChanged);
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class ACTIONROGUELIKE_API USActionComponent : public UActorComponent
 {
@@ -20,6 +22,8 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+	static USActionComponent* GetFrom(AActor* Actor);
+	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 
@@ -32,8 +36,11 @@ public:
 	UFUNCTION()
 	bool StopRunningActions(AActor* Instigator);
 
-	UPROPERTY()
-	FGameplayTagContainer ActiveActionTags;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FGameplayTagContainer ActiveTags;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnTagsChanged OnTagsChanged;
 
 private:
 	UPROPERTY()

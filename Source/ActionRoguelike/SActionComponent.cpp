@@ -19,6 +19,16 @@ void USActionComponent::BeginPlay()
 	Super::BeginPlay();	
 }
 
+USActionComponent* USActionComponent::GetFrom(AActor* Actor)
+{
+	if (!Actor)
+	{
+		return nullptr;
+	}
+	
+	return Cast<USActionComponent>(Actor->GetComponentByClass(StaticClass()));
+}
+
 
 // Called every frame
 void USActionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -36,16 +46,10 @@ bool USActionComponent::StartActionByName(AActor* Instigator, const FName Action
 {
 	for (USAction* Action : Actions)
 	{
-		if (Action->Name == ActionName)
+		if (Action->Name == ActionName && Action->CanStart(Instigator))
 		{
-			if (ActiveActionTags.HasAnyExact(Action->BlockedTags))
-			{
-				UE_LOG(LogTemp, Display, TEXT("Action %s is blocked by an active action"), *GetNameSafe(this));
-				return false;
-			}
-			bool bSuccess;
-			Action->StartAction(Instigator, bSuccess);
-			return bSuccess;
+			Action->StartAction(Instigator);
+			return true;
 		}
 	}
 	return false;
@@ -55,11 +59,10 @@ bool USActionComponent::StopActionByName(AActor* Instigator, const FName ActionN
 {
 	for (USAction* Action : Actions)
 	{
-		if (Action->Name == ActionName)
+		if (Action->Name == ActionName && Action->IsRunning())
 		{
-			bool bSuccess;
-			Action->StopAction(Instigator, bSuccess);
-			return bSuccess;
+			Action->StopAction(Instigator);
+			return true;
 		}
 	}
 	return false;
@@ -71,8 +74,7 @@ bool USActionComponent::StopRunningActions(AActor* Instigator)
 	{
 		if (Action->IsRunning())
 		{
-			bool bSuccess;
-			Action->StopAction(Instigator, bSuccess);
+			Action->StopAction(Instigator);
 		}
 	}
 	return true;

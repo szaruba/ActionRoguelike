@@ -73,4 +73,3 @@ bool ASCharacterBase::IsAlive() const
 {
 	return AttributeComp->IsAlive();
 }
-

@@ -19,8 +19,8 @@ class ACTIONROGUELIKE_API USAction_ProjectileAttack : public USAction
 
 public:
 	USAction_ProjectileAttack();
-	virtual void StartAction_Implementation(AActor* ActionInstigator, bool& bOutSuccess);
-	virtual void StopAction_Implementation(AActor* ActionInstigator, bool& bOutSuccess);
+	virtual void StartAction_Implementation(AActor* ActionInstigator) override;
+	virtual void StopAction_Implementation(AActor* ActionInstigator) override;
 
 protected:
 	void SpawnProjectile(ACharacter* Instigator);

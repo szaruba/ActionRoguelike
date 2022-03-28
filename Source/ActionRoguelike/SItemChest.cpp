@@ -3,6 +3,8 @@
 
 #include "SItemChest.h"
 
+#include "SCharacterBase.h"
+
 
 // Sets default values
 ASItemChest::ASItemChest()
@@ -18,7 +20,18 @@ ASItemChest::ASItemChest()
 
 void ASItemChest::Interact_Implementation(APawn* InstigatorPawn)
 {
-	LidMesh->SetRelativeRotation(FRotator(MaxLidAngle, 0, 0));
+	if (USActionComponent* ActionComp = USActionComponent::GetFrom(InstigatorPawn))
+	{
+		if (ActionComp->ActiveTags.HasAllExact(RequiredTags))
+		{
+			LidMesh->SetRelativeRotation(FRotator(MaxLidAngle, 0, 0));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Display, TEXT("You don't have all required tags to open the chest."));
+		}
+	}
+	
 }
 
 // Called when the game starts or when spawned

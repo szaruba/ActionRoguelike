@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "SProjectile.h"
 #include "GameFramework/Actor.h"
 #include "SMagicProjectile.generated.h"
@@ -28,6 +29,9 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	float Hit_CameraShake_OuterRadius;
+
+	UPROPERTY(EditAnywhere)
+	FGameplayTag ParryTag;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

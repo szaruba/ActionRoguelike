@@ -10,7 +10,7 @@
 class USActionComponent;
 
 /**
- * Action can only be started if it is not running already
+ * Action can only be started if it is not running already and is not blocked by active BlockedTags in the owning comp
  * Action can only be stopped if it is running.
  */
 UCLASS(Blueprintable)
@@ -28,13 +28,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FGameplayTagContainer BlockedTags;
 
-	UFUNCTION(BlueprintNativeEvent)
-	void StartAction(AActor* ActionInstigator, bool& bOutSuccess);
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void StartAction(AActor* ActionInstigator);
 	
-	UFUNCTION(BlueprintNativeEvent)
-	void StopAction(AActor* ActionInstigator, bool& bOutSuccess);
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void StopAction(AActor* ActionInstigator);
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintPure)
+	bool CanStart(AActor* ActionInstigator) const;
+	
 	USActionComponent* GetOwningComponent() const;
+
+	UFUNCTION(BlueprintPure)
 	bool IsRunning() const;
 
 protected:
