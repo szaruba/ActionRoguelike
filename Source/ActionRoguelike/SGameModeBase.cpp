@@ -4,13 +4,20 @@
 #include "SGameModeBase.h"
 
 #include "EngineUtils.h"
+#include "SCoinPickup.h"
+#include "SPlayerState.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
+#include "Kismet/GameplayStatics.h"
 
 static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("su.SpawnBots"), true, TEXT("Enable/Disable bot spawning"), ECVF_Cheat);
+static TAutoConsoleVariable<bool> CVarSpawnCoins = TAutoConsoleVariable<bool>(TEXT("su.SpawnCoins"), true, TEXT("Should spawn coins periodically"));
 
 ASGameModeBase::ASGameModeBase()
 {
 	BotSpawnRate = 5.f;
+	CoinSpawnRate = 3.f;
+
+	PlayerStateClass = ASPlayerState::StaticClass();
 }
 
 void ASGameModeBase::KillAll()
@@ -26,8 +33,20 @@ void ASGameModeBase::StartPlay()
 {
 	Super::StartPlay();
 
-	FTimerHandle TimerHandle;
-	GetWorldTimerManager().SetTimer(TimerHandle, this, &ASGameModeBase::RunSpawnBotQuery, BotSpawnRate, true);
+	FTimerHandle TimerHandle_BotSpawn;
+	GetWorldTimerManager().SetTimer(TimerHandle_BotSpawn, this, &ASGameModeBase::RunSpawnBotQuery, BotSpawnRate, true);
+	FTimerHandle TimerHandle_CoinSpawn;
+	GetWorldTimerManager().SetTimer(TimerHandle_CoinSpawn, this, &ASGameModeBase::SpawnCoin, CoinSpawnRate, true);
+}
+
+void ASGameModeBase::SpawnCoin()
+{
+	if (!CVarSpawnCoins.GetValueOnGameThread())
+	{
+		return;
+	}
+	UEnvQueryInstanceBlueprintWrapper* QueryInstance = UEnvQueryManager::RunEQSQuery(this, EnvQuery_FindCoinSpawn, this, EEnvQueryRunMode::AllMatching, nullptr);
+	QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this, &ASGameModeBase::HandleSpawnCoinQueryFinished);
 }
 
 void ASGameModeBase::RunSpawnBotQuery()
@@ -60,6 +79,15 @@ void ASGameModeBase::HandlePawnKilled(APawn* KilledPawn, APawn* InstigatorPawn)
 	if (APlayerController* PlayerController = Cast<APlayerController>(PawnController))
 	{
 		RespawnPlayer(PlayerController);
+	}
+
+	// If killer is a player, then grant them reward credits for the kill.
+	if (InstigatorPawn)
+	{
+		if (ASPlayerState* PlayerState = InstigatorPawn->GetPlayerState<ASPlayerState>())
+		{
+			PlayerState->AddCredits(100);
+		}
 	}
 	
 	DisposeCorpse(KilledPawn);
@@ -108,4 +136,20 @@ void ASGameModeBase::HandleSpawnBotQueryFinished(UEnvQueryInstanceBlueprintWrapp
 		// });
 	}
 
+}
+
+void ASGameModeBase::HandleSpawnCoinQueryFinished(UEnvQueryInstanceBlueprintWrapper* QueryInstance,
+	EEnvQueryStatus::Type QueryStatus)
+{
+	TArray<FVector> SpawnLocations;
+	QueryInstance->GetQueryResultsAsLocations(SpawnLocations);
+	if (QueryStatus == EEnvQueryStatus::Type::Success && SpawnLocations.Num() > 0)
+	{
+		FVector SpawnLocation = SpawnLocations[FMath::RandRange(0, SpawnLocations.Num()-1)];
+
+		FActorSpawnParameters SpawnParameters;
+		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+		const FTransform SpawnTM = FTransform(SpawnLocation);
+		GetWorld()->SpawnActor(ASCoinPickup::StaticClass(), &SpawnTM, SpawnParameters);
+	}
 }

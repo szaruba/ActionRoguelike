@@ -37,9 +37,16 @@ protected:
 	UEnvQuery* EnvQuery_FindBotSpawn;
 
 	UPROPERTY(EditAnywhere)
+	UEnvQuery* EnvQuery_FindCoinSpawn;
+
+	UPROPERTY(EditAnywhere)
 	TSubclassOf<ASAICharacter> BotCharacterClass;
+
+	UPROPERTY(EditAnywhere)
+	float CoinSpawnRate;
 	
 	virtual void StartPlay() override;
+	void SpawnCoin();
 
 	UFUNCTION()
 	void RunSpawnBotQuery();
@@ -55,4 +62,7 @@ protected:
 private:
 	UFUNCTION()
 	void HandleSpawnBotQueryFinished(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
+
+	UFUNCTION()
+	void HandleSpawnCoinQueryFinished(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
 };

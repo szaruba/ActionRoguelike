@@ -4,6 +4,7 @@
 #include "SHealthPotion.h"
 
 #include "SAttributeComponent.h"
+#include "SPlayerState.h"
 
 
 // Sets default values
@@ -13,6 +14,7 @@ ASHealthPotion::ASHealthPotion()
 	PrimaryActorTick.bCanEverTick = true;
 
 	HealAmount = 50.f;
+	CreditCost = 100;
 }
 
 // Called when the game starts or when spawned
@@ -33,8 +35,18 @@ void ASHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 	if (InstigatorPawn)
 	{
 		USAttributeComponent* AttrComp = USAttributeComponent::GetAttributes(InstigatorPawn);
+		
 		if (AttrComp && !AttrComp->IsFullHealth())
 		{
+			// if Instigator is a player check if they have enough credits to use potion
+			if (ASPlayerState* PlayerState = InstigatorPawn->GetPlayerState<ASPlayerState>())
+			{
+				if (!PlayerState->RemoveCredits(CreditCost))
+				{
+					return;
+				}
+			}
+			
 			AttrComp->ApplyHealthChange(this, HealAmount);
 			StartInactiveDuration();
 		}

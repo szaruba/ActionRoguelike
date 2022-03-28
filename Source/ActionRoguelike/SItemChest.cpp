@@ -31,7 +31,6 @@ void ASItemChest::Interact_Implementation(APawn* InstigatorPawn)
 			UE_LOG(LogTemp, Display, TEXT("You don't have all required tags to open the chest."));
 		}
 	}
-	
 }
 
 // Called when the game starts or when spawned
