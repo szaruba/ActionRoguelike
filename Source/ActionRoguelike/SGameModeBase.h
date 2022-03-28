@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SCoinPickup.h"
 #include "AI/SAICharacter.h"
 #include "EnvironmentQuery/EnvQuery.h"
 #include "GameFramework/GameModeBase.h"
@@ -44,6 +45,9 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	float CoinSpawnRate;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<ASCoinPickup> SpawnedCoinClass;
 	
 	virtual void StartPlay() override;
 	void SpawnCoin();

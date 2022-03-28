@@ -135,7 +135,6 @@ void ASGameModeBase::HandleSpawnBotQueryFinished(UEnvQueryInstanceBlueprintWrapp
 		// 	}
 		// });
 	}
-
 }
 
 void ASGameModeBase::HandleSpawnCoinQueryFinished(UEnvQueryInstanceBlueprintWrapper* QueryInstance,
@@ -150,6 +149,6 @@ void ASGameModeBase::HandleSpawnCoinQueryFinished(UEnvQueryInstanceBlueprintWrap
 		FActorSpawnParameters SpawnParameters;
 		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 		const FTransform SpawnTM = FTransform(SpawnLocation);
-		GetWorld()->SpawnActor(ASCoinPickup::StaticClass(), &SpawnTM, SpawnParameters);
+		GetWorld()->SpawnActor(SpawnedCoinClass, &SpawnTM, SpawnParameters);
 	}
 }
