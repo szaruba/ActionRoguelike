@@ -10,6 +10,8 @@
 class USAttributeComponent;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnHealthChanged, USAttributeComponent*, OwningComp, AActor*, InstigatorActor, float, HealthNew, float, HealthDelta);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnRageChanged, USAttributeComponent*, AttributeComp, float, NewValue, float, Delta);
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class ACTIONROGUELIKE_API USAttributeComponent : public UActorComponent
 {
@@ -33,6 +35,9 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnHealthChanged OnHealthChanged;
 
+	UPROPERTY(BlueprintAssignable)
+	FOnRageChanged OnRageChanged;
+
 	UFUNCTION(BlueprintCallable)
 	bool ApplyHealthChange(AActor* InstigatorActor, float Delta);
 
@@ -46,9 +51,26 @@ public:
 	UFUNCTION(BlueprintPure)
 	float GetHealthMax() const;
 
+	UFUNCTION(BlueprintCallable)
+	void ApplyRageChange(float Delta);
+	UFUNCTION(BlueprintPure)
+	float GetRage() const;
+	UFUNCTION(BlueprintPure)
+	float GetRageMax() const;
+	UFUNCTION(BlueprintPure)
+	float GetRageGainRate() const;
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float Health;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float HealthMax;
+
+	UPROPERTY(EditAnywhere)
+	float Rage;
+	UPROPERTY(EditAnywhere)
+	float RageMax;
+	// How many points of rage are gained per health point lost
+	UPROPERTY(EditAnywhere)
+	float RageGainRate;
 };

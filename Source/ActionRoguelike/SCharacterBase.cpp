@@ -55,6 +55,12 @@ void ASCharacterBase::HandleHealthChanged(USAttributeComponent* OwningComp, AAct
 		GetMesh()->SetCollisionProfileName("Ragdoll");
 		SetLifeSpan(5.f);
 	}
+
+	// Rage
+	if (HealthDelta < 0.f)
+	{
+		AttributeComp->ApplyRageChange(FMath::Abs(HealthDelta) * AttributeComp->GetRageGainRate());
+	}
 }
 
 // Called every frame

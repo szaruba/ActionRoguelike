@@ -9,6 +9,10 @@ USAttributeComponent::USAttributeComponent()
 {
 	HealthMax = 100;
 	Health = HealthMax;
+
+	RageMax = 100.f;
+	Rage = 0.f;
+	RageGainRate = 2.f;
 }
 
 
@@ -51,6 +55,33 @@ float USAttributeComponent::GetHealth() const
 float USAttributeComponent::GetHealthMax() const
 {
 	return HealthMax;
+}
+
+void USAttributeComponent::ApplyRageChange(float Delta)
+{
+	float OldRageValue = Rage;
+	Rage += Delta;
+	Rage = FMath::Clamp(Rage, 0.f, RageMax);
+	float ActualDelta = Rage - OldRageValue;
+	if (ActualDelta != 0.f)
+	{
+		OnRageChanged.Broadcast(this, Rage, ActualDelta);
+	}
+}
+
+float USAttributeComponent::GetRage() const
+{
+	return Rage;
+}
+
+float USAttributeComponent::GetRageMax() const
+{
+	return RageMax;
+}
+
+float USAttributeComponent::GetRageGainRate() const
+{
+	return RageGainRate;
 }
 
 USAttributeComponent* USAttributeComponent::GetAttributes(AActor* OfActor)

@@ -18,7 +18,9 @@ class ACTIONROGUELIKE_API USAction : public UObject
 {
 	GENERATED_BODY()
 
-public:	
+public:
+	USAction();
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FName Name;
 
@@ -51,4 +53,7 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	bool bAutoStart;
+
+	UPROPERTY(EditAnywhere)
+	float RageActivationCost;
 };

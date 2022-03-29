@@ -4,10 +4,23 @@
 #include "SAction.h"
 
 #include "SActionComponent.h"
+#include "SAttributeComponent.h"
+
+
+USAction::USAction()
+{
+	RageActivationCost = 0.f;
+}
 
 void USAction::StartAction_Implementation(AActor* ActionInstigator)
 {
 	UE_LOG(LogTemp, Display, TEXT("Start Action %s"), *GetNameSafe(this));
+
+	if (USAttributeComponent* Attributes = USAttributeComponent::GetAttributes(ActionInstigator))
+	{
+		Attributes->ApplyRageChange(-RageActivationCost);
+	}
+	
 	GetOwningComponent()->ActiveTags.AppendTags(GrantedTags);
 	bIsRunning = true;
 }
@@ -27,6 +40,13 @@ bool USAction::CanStart_Implementation(AActor* ActionInstigator) const
 	}
 
 	if (!GetOwningComponent() || GetOwningComponent()->ActiveTags.HasAnyExact(BlockedTags))
+	{
+		return false;
+	}
+
+	USAttributeComponent* Attributes = USAttributeComponent::GetAttributes(GetOwningComponent()->GetOwner());
+
+	if (Attributes && Attributes->GetRage() < RageActivationCost)
 	{
 		return false;
 	}
