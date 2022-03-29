@@ -3,8 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SWorldUserWidget.h"
 #include "Components/ActorComponent.h"
 #include "SInteractComponent.generated.h"
+
 
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -24,9 +26,19 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	float InteractionSphereRadius;
+
+	UPROPERTY()
+	AActor* TargetActor;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<USWorldUserWidget> OverlayWidgetClass;
+
+	UPROPERTY()
+	USWorldUserWidget* OverlayWidget;
 	
 	// Called when the game starts
 	virtual void BeginPlay() override;
+	void ScanForTargetActor();
 
 public:
 	// Called every frame

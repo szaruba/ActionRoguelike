@@ -3,8 +3,8 @@
 
 #include "SInteractComponent.h"
 
-#include "DrawDebugHelpers.h"
 #include "SGameplayInterface.h"
+#include "Blueprint/UserWidget.h"
 
 
 // Sets default values for this component's properties
@@ -19,13 +19,33 @@ USInteractComponent::USInteractComponent()
 }
 
 void USInteractComponent::PrimaryInteract() const
-{	
+{
+	APawn* InstigatorPawn = Cast<APawn>(GetOwner());
+	if (TargetActor && ensure(InstigatorPawn))
+	{
+		ISGameplayInterface::Execute_Interact(TargetActor, InstigatorPawn);
+	}
+	
+}
+
+
+// Called when the game starts
+void USInteractComponent::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+
+void USInteractComponent::ScanForTargetActor()
+{
+	TargetActor = nullptr;
+	
 	APawn* OwnerPawn = GetOwner<APawn>();
 	if (!OwnerPawn)
 	{
 		return;
 	}
-
+	
 	TArray<FHitResult> Hits;
 	FCollisionObjectQueryParams ObjectQueryParams;
 	ObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldDynamic);
@@ -35,22 +55,14 @@ void USInteractComponent::PrimaryInteract() const
 	OwnerPawn->GetController()->GetPlayerViewPoint(ViewPoint, ViewRotation);
 	FVector SweepEnd = ViewPoint + ViewRotation.Vector() * InteractionRange * 2;
 	GetWorld()->SweepMultiByObjectType(Hits, ViewPoint, SweepEnd, FQuat::Identity, ObjectQueryParams, CollisionShape);
-	DrawDebugLine(GetWorld(), ViewPoint, SweepEnd, FColor::Blue, false, 2.f, 0, 2.f);
 	
 	for (FHitResult Hit : Hits)
 	{
 		AActor* HitActor = Hit.GetActor();
-		APawn* InstigatorPawn = Cast<APawn>(GetOwner());
-		if (HitActor->Implements<USGameplayInterface>() && InstigatorPawn && OwnerPawn->GetDistanceTo(HitActor) <= InteractionRange)
+		if (HitActor->Implements<USGameplayInterface>() && OwnerPawn->GetDistanceTo(HitActor) <= InteractionRange)
 		{
-			ISGameplayInterface::Execute_Interact(HitActor, InstigatorPawn);
-
-			DrawDebugSphere(GetWorld(), Hit.Location, InteractionSphereRadius, 32, FColor::Green, false, 2.f, 0, 2.f);
+			TargetActor = HitActor;
 			break;
-		}
-		else
-		{
-			DrawDebugSphere(GetWorld(), Hit.Location, InteractionSphereRadius, 32, FColor::Red, false, 2.f, 0, 2.f);
 		}
 		
 		if (Hit.bBlockingHit)
@@ -60,23 +72,32 @@ void USInteractComponent::PrimaryInteract() const
 	}
 }
 
-
-// Called when the game starts
-void USInteractComponent::BeginPlay()
-{
-	Super::BeginPlay();
-
-	// ...
-	
-}
-
-
 // Called every frame
 void USInteractComponent::TickComponent(float DeltaTime, ELevelTick TickType,
                                         FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	
+	ScanForTargetActor();
 
-	// ...
+	// Handle Overlay Widget
+	if (TargetActor)
+	{
+		if (!OverlayWidget && ensure(OverlayWidgetClass))
+		{
+			OverlayWidget = CreateWidget<USWorldUserWidget>(GetWorld(), OverlayWidgetClass);
+		}
+		
+		OverlayWidget->AttachedActor = TargetActor;
+
+		if (!OverlayWidget->IsInViewport())
+		{
+			OverlayWidget->AddToViewport();
+		}
+	}
+	if (!TargetActor && OverlayWidget && OverlayWidget->IsInViewport())
+	{
+		OverlayWidget->RemoveFromParent();
+	}
 }
 
