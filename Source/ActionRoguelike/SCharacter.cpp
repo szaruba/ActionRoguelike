@@ -77,7 +77,7 @@ void ASCharacter::BeginPlay()
 
 	for (const TSubclassOf<USAction> DefaultAction : DefaultActions)
 	{
-		ActionComp->AddAction(DefaultAction);
+		ActionComp->AddAction(GetOwner(), DefaultAction);
 	}
 }
 

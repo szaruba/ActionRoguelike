@@ -36,12 +36,19 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintPure)
 	bool CanStart(AActor* ActionInstigator) const;
-	
+
+	UFUNCTION(BlueprintPure)
 	USActionComponent* GetOwningComponent() const;
 
 	UFUNCTION(BlueprintPure)
 	bool IsRunning() const;
 
+	UFUNCTION(BlueprintPure)
+	bool GetAutoStart() const;
+	
 protected:
 	bool bIsRunning;
+
+	UPROPERTY(EditAnywhere)
+	bool bAutoStart;
 };

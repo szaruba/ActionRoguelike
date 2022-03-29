@@ -43,18 +43,22 @@ void ASMagicProjectile::HandleOnOverlap(UPrimitiveComponent* OverlappedComponent
 {
 	if (OtherActor && OtherActor != GetInstigator())
 	{
-		if (USActionComponent* ActionComponent = USActionComponent::GetFrom(OtherActor))
+		USActionComponent* ActionComponent = USActionComponent::GetFrom(OtherActor);
+		if (ActionComponent && ActionComponent->ActiveTags.HasTagExact(ParryTag))
 		{
-			if (ActionComponent->ActiveTags.HasTagExact(ParryTag))
-			{
-				MovementComp->Velocity = -MovementComp->Velocity;
-				SetInstigator(Cast<APawn>(OtherActor));
-				return;
-			}
+			MovementComp->Velocity = -MovementComp->Velocity;
+			SetInstigator(Cast<APawn>(OtherActor));
+			return;
 		}
 		
 		if(USGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(), OtherActor, Damage, SweepResult))
 		{
+			// Apply burning effect
+			if (ActionComponent)
+			{
+				ActionComponent->AddAction(GetInstigator(), BurningActionClass);
+			}
+			
 			Explode();
 		}
 	}

@@ -36,10 +36,30 @@ void USActionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-void USActionComponent::AddAction(TSubclassOf<USAction> ActionClass)
+void USActionComponent::AddAction(AActor* Instigator, TSubclassOf<USAction> ActionClass)
 {
+	if(!ensure(ActionClass))
+	{
+		return;
+	}
+	
 	USAction* Action = NewObject<USAction>(this, ActionClass);
 	Actions.Emplace(Action);
+
+	if (Action->GetAutoStart() && ensure(Action->CanStart(Instigator)))
+	{
+		Action->StartAction(Instigator);
+	}
+}
+
+void USActionComponent::RemoveAction(USAction* Action)
+{
+	if(!ensure(Action && !Action->IsRunning()))
+	{
+		return;
+	}
+	
+	Actions.Remove(Action);
 }
 
 bool USActionComponent::StartActionByName(AActor* Instigator, const FName ActionName)

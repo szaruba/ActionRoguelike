@@ -28,7 +28,9 @@ public:
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable)
-	void AddAction(TSubclassOf<USAction> ActionClass);
+	void AddAction(AActor* Instigator, TSubclassOf<USAction> ActionClass);
+	UFUNCTION(BlueprintCallable)
+	void RemoveAction(USAction* Action);
 	UFUNCTION()
 	bool StartActionByName(AActor* Instigator, const FName ActionName);
 	UFUNCTION()

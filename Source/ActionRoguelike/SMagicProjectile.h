@@ -8,6 +8,7 @@
 #include "GameFramework/Actor.h"
 #include "SMagicProjectile.generated.h"
 
+class USAction;
 UCLASS()
 class ACTIONROGUELIKE_API ASMagicProjectile : public ASProjectile
 {
@@ -32,6 +33,9 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	FGameplayTag ParryTag;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<USAction> BurningActionClass;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

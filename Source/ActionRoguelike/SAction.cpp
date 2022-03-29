@@ -43,3 +43,8 @@ bool USAction::IsRunning() const
 {
 	return bIsRunning;
 }
+
+bool USAction::GetAutoStart() const
+{
+	return bAutoStart;
+}
