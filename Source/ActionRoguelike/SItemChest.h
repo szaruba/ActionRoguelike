@@ -27,6 +27,9 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float MaxLidAngle = 110.f;
 
+	UPROPERTY(ReplicatedUsing="OnRep_LidOpen")
+	bool bLidOpen;
+
 	/* Required Tags in order to open the chest */
 	UPROPERTY(EditAnywhere)
 	FGameplayTagContainer RequiredTags;
@@ -34,7 +37,15 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UFUNCTION()
+	void OnRep_LidOpen();
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutLifetimeProps) const override;
+	
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION(BlueprintPure)
+	bool GetLidOpen() const;
 };

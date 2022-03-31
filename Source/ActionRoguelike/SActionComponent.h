@@ -22,6 +22,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+	UFUNCTION(BlueprintPure)
 	static USActionComponent* GetFrom(AActor* Actor);
 	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
@@ -29,11 +30,15 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void AddAction(AActor* Instigator, TSubclassOf<USAction> ActionClass);
+	UFUNCTION(BlueprintPure)
+	bool HasActionClass(TSubclassOf<USAction> ActionClass) const;
 	UFUNCTION(BlueprintCallable)
 	void RemoveAction(USAction* Action);
+	UFUNCTION(BlueprintCallable)
+	void RemoveActionClass(TSubclassOf<USAction> ActionClass);
 	UFUNCTION()
 	bool StartActionByName(AActor* Instigator, const FName ActionName);
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	bool StopActionByName(AActor* Instigator, const FName ActionName);
 	UFUNCTION()
 	bool StopRunningActions(AActor* Instigator);

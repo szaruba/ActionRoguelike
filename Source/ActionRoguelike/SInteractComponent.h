@@ -18,7 +18,7 @@ public:
 	// Sets default values for this component's properties
 	USInteractComponent();
 
-	void PrimaryInteract() const;
+	void PrimaryInteract();
 
 protected:
 	UPROPERTY(EditAnywhere)
@@ -39,6 +39,9 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 	void ScanForTargetActor();
+
+	UFUNCTION(Server, Reliable)
+	void ServerPrimaryInteract(AActor* Target);
 
 public:
 	// Called every frame

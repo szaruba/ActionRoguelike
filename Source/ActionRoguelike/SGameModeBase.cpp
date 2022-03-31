@@ -9,7 +9,7 @@
 #include "EnvironmentQuery/EnvQueryManager.h"
 #include "Kismet/GameplayStatics.h"
 
-static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("su.SpawnBots"), true, TEXT("Enable/Disable bot spawning"), ECVF_Cheat);
+static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("su.SpawnBots"), false, TEXT("Enable/Disable bot spawning"), ECVF_Cheat);
 static TAutoConsoleVariable<bool> CVarSpawnCoins = TAutoConsoleVariable<bool>(TEXT("su.SpawnCoins"), true, TEXT("Should spawn coins periodically"));
 
 ASGameModeBase::ASGameModeBase()

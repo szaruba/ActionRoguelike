@@ -45,6 +45,8 @@ void ASAICharacter::SetTargetActor(AActor* TargetActor)
 
 void ASAICharacter::OnSeePawn(APawn* SeenPawn)
 {
+	// Display Exclamation Mark
+	
 	SetTargetActor(SeenPawn);
 }
 

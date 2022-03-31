@@ -4,6 +4,7 @@
 #include "SItemChest.h"
 
 #include "SCharacterBase.h"
+#include "Net/UnrealNetwork.h"
 
 
 // Sets default values
@@ -16,15 +17,26 @@ ASItemChest::ASItemChest()
 	SetRootComponent(BaseMesh);
 	LidMesh = CreateDefaultSubobject<UStaticMeshComponent>("LidMesh");
 	LidMesh->SetupAttachment(BaseMesh);
+
+	bLidOpen = false;
+
+	bReplicates = true;
 }
 
 void ASItemChest::Interact_Implementation(APawn* InstigatorPawn)
 {
-	if (USActionComponent* ActionComp = USActionComponent::GetFrom(InstigatorPawn))
+	if (bLidOpen)
 	{
-		if (ActionComp->ActiveTags.HasAllExact(RequiredTags))
+		bLidOpen = false;
+		OnRep_LidOpen();
+	}
+	else
+	{
+		USActionComponent* ActionComp = USActionComponent::GetFrom(InstigatorPawn);
+		if (!ActionComp || ActionComp->ActiveTags.HasAllExact(RequiredTags))
 		{
-			LidMesh->SetRelativeRotation(FRotator(MaxLidAngle, 0, 0));
+			bLidOpen = true;
+			OnRep_LidOpen();
 		}
 		else
 		{
@@ -40,9 +52,33 @@ void ASItemChest::BeginPlay()
 	
 }
 
+void ASItemChest::OnRep_LidOpen()
+{
+	if (bLidOpen)
+	{
+		LidMesh->SetRelativeRotation(FRotator(MaxLidAngle, 0, 0));
+	}
+	else
+	{
+		LidMesh->SetRelativeRotation(FRotator::ZeroRotator);
+	}
+}
+
+void ASItemChest::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ASItemChest, bLidOpen);
+}
+
 // Called every frame
 void ASItemChest::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+bool ASItemChest::GetLidOpen() const
+{
+	return bLidOpen;
 }
 

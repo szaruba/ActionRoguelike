@@ -52,6 +52,11 @@ void USActionComponent::AddAction(AActor* Instigator, TSubclassOf<USAction> Acti
 	}
 }
 
+bool USActionComponent::HasActionClass(TSubclassOf<USAction> ActionClass) const
+{
+	return ContainsObjectOfClass(Actions, ActionClass);
+}
+
 void USActionComponent::RemoveAction(USAction* Action)
 {
 	if(!ensure(Action && !Action->IsRunning()))
@@ -60,6 +65,24 @@ void USActionComponent::RemoveAction(USAction* Action)
 	}
 	
 	Actions.Remove(Action);
+}
+
+void USActionComponent::RemoveActionClass(TSubclassOf<USAction> ActionClass)
+{
+	for (int32 Index = Actions.Num() - 1; Index >= 0; --Index)
+	{
+		if (Actions[Index]->IsA(ActionClass))
+		{
+			if (!Actions[Index]->IsRunning())
+			{
+				Actions.RemoveAt(Index);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Tried to remove a running action. Stop it before removing."));
+			}
+		}
+	}
 }
 
 bool USActionComponent::StartActionByName(AActor* Instigator, const FName ActionName)

@@ -18,14 +18,18 @@ USInteractComponent::USInteractComponent()
 	InteractionSphereRadius = 50.f;
 }
 
-void USInteractComponent::PrimaryInteract() const
+void USInteractComponent::PrimaryInteract()
+{
+	ServerPrimaryInteract(TargetActor);
+}
+
+void USInteractComponent::ServerPrimaryInteract_Implementation(AActor* Target)
 {
 	APawn* InstigatorPawn = Cast<APawn>(GetOwner());
-	if (TargetActor && ensure(InstigatorPawn))
+	if (Target && ensure(InstigatorPawn))
 	{
-		ISGameplayInterface::Execute_Interact(TargetActor, InstigatorPawn);
+		ISGameplayInterface::Execute_Interact(Target, InstigatorPawn);
 	}
-	
 }
 
 
@@ -41,7 +45,7 @@ void USInteractComponent::ScanForTargetActor()
 	TargetActor = nullptr;
 	
 	APawn* OwnerPawn = GetOwner<APawn>();
-	if (!OwnerPawn)
+	if (!OwnerPawn || !OwnerPawn->GetController())
 	{
 		return;
 	}
@@ -77,8 +81,11 @@ void USInteractComponent::TickComponent(float DeltaTime, ELevelTick TickType,
                                         FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	
-	ScanForTargetActor();
+
+	if (GetOwner<APawn>()->IsLocallyControlled())
+	{
+		ScanForTargetActor();
+	}
 
 	// Handle Overlay Widget
 	if (TargetActor)
