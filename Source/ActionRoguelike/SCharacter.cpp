@@ -74,11 +74,6 @@ void ASCharacter::MoveRight(float value)
 void ASCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
-	for (const TSubclassOf<USAction> DefaultAction : DefaultActions)
-	{
-		ActionComp->AddAction(GetOwner(), DefaultAction);
-	}
 }
 
 void ASCharacter::PrimaryAttack()

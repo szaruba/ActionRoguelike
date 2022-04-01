@@ -46,10 +46,6 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	USInteractComponent* InteractComp;
 
-	UPROPERTY(EditAnywhere)
-	TArray<TSubclassOf<USAction>> DefaultActions;
-
-
 
 	void MoveForward(float value);
 	void MoveRight(float value);

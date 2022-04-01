@@ -5,6 +5,7 @@
 
 #include "SActionComponent.h"
 #include "SAttributeComponent.h"
+#include "Net/UnrealNetwork.h"
 
 
 USAction::USAction()
@@ -22,19 +23,29 @@ void USAction::StartAction_Implementation(AActor* ActionInstigator)
 	}
 	
 	GetOwningComponent()->ActiveTags.AppendTags(GrantedTags);
-	bIsRunning = true;
+	
+	if(GetTypedOuter<AActor>()->HasAuthority())
+	{
+		RepData.bIsRunning = true;
+		RepData.Instigator = ActionInstigator;
+	}
 }
 
 void USAction::StopAction_Implementation(AActor* ActionInstigator)
 {
 	UE_LOG(LogTemp, Display, TEXT("Stop Action %s"), *GetNameSafe(this));
 	GetOwningComponent()->ActiveTags.RemoveTags(GrantedTags);
-	bIsRunning = false;
+
+	if(GetTypedOuter<AActor>()->HasAuthority())
+	{
+		RepData.bIsRunning = false;
+		RepData.Instigator = ActionInstigator;
+	}
 }
 
 bool USAction::CanStart_Implementation(AActor* ActionInstigator) const
 {
-	if (bIsRunning)
+	if (RepData.bIsRunning)
 	{
 		return false;
 	}
@@ -56,15 +67,45 @@ bool USAction::CanStart_Implementation(AActor* ActionInstigator) const
 
 USActionComponent* USAction::GetOwningComponent() const
 {
-	return Cast<USActionComponent>(GetOuter());
+	AActor* OwningActor = GetTypedOuter<AActor>();
+	return USActionComponent::GetFrom(OwningActor);
 }
 
 bool USAction::IsRunning() const
 {
-	return bIsRunning;
+	return RepData.bIsRunning;
 }
 
 bool USAction::GetAutoStart() const
 {
 	return bAutoStart;
+}
+
+UWorld* USAction::GetWorld() const
+{
+	if (AActor* OwningActor = GetTypedOuter<AActor>())
+	{
+		return OwningActor->GetWorld();
+	}
+	return nullptr;
+}
+
+void USAction::OnRep_RepData()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Replicating!!"));
+	if (RepData.bIsRunning)
+	{
+		StartAction(RepData.Instigator);
+	}
+	else
+	{
+		StopAction(RepData.Instigator);
+	}
+}
+
+void USAction::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(USAction, RepData);
 }

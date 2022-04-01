@@ -9,6 +9,18 @@
 
 class USActionComponent;
 
+USTRUCT()
+struct FActionRepData
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	bool bIsRunning;
+
+	UPROPERTY()
+	AActor* Instigator;
+};
+
 /**
  * Action can only be started if it is not running already and is not blocked by active BlockedTags in the owning comp
  * Action can only be stopped if it is running.
@@ -47,13 +59,24 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	bool GetAutoStart() const;
+
+	virtual UWorld* GetWorld() const override;
+
+	virtual bool IsSupportedForNetworking() const override
+	{
+		return true;
+	}
 	
 protected:
-	bool bIsRunning;
-
 	UPROPERTY(EditAnywhere)
 	bool bAutoStart;
 
 	UPROPERTY(EditAnywhere)
 	float RageActivationCost;
+
+	UPROPERTY(ReplicatedUsing="OnRep_RepData")
+	FActionRepData RepData;
+
+	UFUNCTION()
+	void OnRep_RepData();
 };

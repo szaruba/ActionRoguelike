@@ -38,8 +38,12 @@ public:
 	void RemoveActionClass(TSubclassOf<USAction> ActionClass);
 	UFUNCTION()
 	bool StartActionByName(AActor* Instigator, const FName ActionName);
+	UFUNCTION(Server, Reliable)
+	void ServerStartActionByName(AActor* Instigator, const FName ActionName);
 	UFUNCTION(BlueprintCallable)
 	bool StopActionByName(AActor* Instigator, const FName ActionName);
+	UFUNCTION(Server, Reliable)
+	void ServerStopActionByName(AActor* Instigator, const FName ActionName);
 	UFUNCTION()
 	bool StopRunningActions(AActor* Instigator);
 
@@ -49,7 +53,13 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnTagsChanged OnTagsChanged;
 
+	virtual bool ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
+
+protected:
+	UPROPERTY(EditAnywhere)
+	TArray<TSubclassOf<USAction>> DefaultActions;
+	
 private:
-	UPROPERTY()
+	UPROPERTY(Replicated)
 	TArray<USAction*> Actions;
 };

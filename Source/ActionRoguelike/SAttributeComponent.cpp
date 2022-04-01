@@ -3,6 +3,8 @@
 
 #include "SAttributeComponent.h"
 
+#include "Net/UnrealNetwork.h"
+
 
 // Sets default values for this component's properties
 USAttributeComponent::USAttributeComponent()
@@ -13,6 +15,8 @@ USAttributeComponent::USAttributeComponent()
 	RageMax = 100.f;
 	Rage = 0.f;
 	RageGainRate = 2.f;
+
+	SetIsReplicatedByDefault(true);
 }
 
 
@@ -23,17 +27,22 @@ void USAttributeComponent::BeginPlay()
 }
 
 bool USAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Delta)
-{
+{	
 	AActor* OwnerActor = GetOwner();
-	if (OwnerActor && !OwnerActor->CanBeDamaged())
+	if (!ensure(OwnerActor) || !OwnerActor->CanBeDamaged() || !OwnerActor->HasAuthority())
 	{
 		return false;
 	}
+	
 	float HealthBefore = Health;
 	Health += Delta;
 	Health = FMath::Clamp(Health, 0.f, HealthMax);
 	float ActualDelta = Health - HealthBefore;
-	OnHealthChanged.Broadcast(this, InstigatorActor, Health, ActualDelta);
+
+	if (ActualDelta != 0.f)
+	{
+		MulticastHealthChanged(InstigatorActor, Health, ActualDelta);
+	}
 	return true;
 }
 
@@ -102,5 +111,24 @@ bool USAttributeComponent::IsActorAlive(AActor* Actor)
 		return AttrComp->IsAlive();
 	}
 	return false;
+}
+
+/*
+ * Replication
+ */
+
+void USAttributeComponent::MulticastHealthChanged_Implementation(AActor* InstigatorActor, float HealthNew,
+	float HealthDelta)
+{
+	OnHealthChanged.Broadcast(this, InstigatorActor, HealthNew, HealthDelta);
+}
+
+
+void USAttributeComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(USAttributeComponent, Health);
+	DOREPLIFETIME(USAttributeComponent, HealthMax);
 }
 

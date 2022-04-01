@@ -17,6 +17,8 @@ ASPickup::ASPickup()
 	BaseMesh->SetupAttachment(CollisionComp);
 
 	InactiveDuration = 10.f;
+
+	bReplicates = true;
 }
 
 // Called when the game starts or when spawned

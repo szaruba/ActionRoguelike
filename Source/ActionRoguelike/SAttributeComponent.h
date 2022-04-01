@@ -61,9 +61,9 @@ public:
 	float GetRageGainRate() const;
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated)
 	float Health;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated)
 	float HealthMax;
 
 	UPROPERTY(EditAnywhere)
@@ -73,4 +73,7 @@ protected:
 	// How many points of rage are gained per health point lost
 	UPROPERTY(EditAnywhere)
 	float RageGainRate;
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastHealthChanged(AActor* InstigatorActor, float HealthNew, float HealthDelta);
 };

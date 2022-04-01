@@ -30,15 +30,15 @@ protected:
 	UPROPERTY(ReplicatedUsing="OnRep_LidOpen")
 	bool bLidOpen;
 
+	UFUNCTION()
+	void OnRep_LidOpen();
+
 	/* Required Tags in order to open the chest */
 	UPROPERTY(EditAnywhere)
 	FGameplayTagContainer RequiredTags;
 	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-	UFUNCTION()
-	void OnRep_LidOpen();
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutLifetimeProps) const override;
 	
