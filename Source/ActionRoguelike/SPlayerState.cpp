@@ -3,6 +3,8 @@
 
 #include "SPlayerState.h"
 
+#include "Net/UnrealNetwork.h"
+
 
 // Sets default values
 ASPlayerState::ASPlayerState()
@@ -27,8 +29,19 @@ void ASPlayerState::Tick(float DeltaTime)
 
 void ASPlayerState::AddCredits(int32 Amount)
 {
+	// if (!HasAuthority())
+	// {
+	// 	ServerAddCredits(Amount);
+	// 	return;
+	// }
+	
 	Credits += Amount;
 	OnCreditsChanged.Broadcast(this, Credits, Amount);
+}
+
+void ASPlayerState::ServerAddCredits_Implementation(int32 Amount)
+{
+	AddCredits(Amount);
 }
 
 bool ASPlayerState::RemoveCredits(int32 Amount)
@@ -37,14 +50,37 @@ bool ASPlayerState::RemoveCredits(int32 Amount)
 	{
 		return false;
 	}
+	
+	// if (!HasAuthority())
+	// {
+	// 	ServerRemoveCredits(Amount);
+	// 	return true;
+	// }
 
 	Credits -= Amount;
 	OnCreditsChanged.Broadcast(this, Credits, -Amount);
 	return true;
 }
 
+void ASPlayerState::ServerRemoveCredits_Implementation(int32 Amount)
+{
+	RemoveCredits(Amount);
+}
+
 int32 ASPlayerState::GetCredits() const
 {
 	return Credits;
+}
+
+void ASPlayerState::OnRep_Credits(int32 CreditsOld)
+{
+	OnCreditsChanged.Broadcast(this, Credits, Credits - CreditsOld);
+}
+
+void ASPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ASPlayerState, Credits);
 }
 

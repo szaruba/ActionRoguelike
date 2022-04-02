@@ -93,6 +93,11 @@ float USAttributeComponent::GetRageGainRate() const
 	return RageGainRate;
 }
 
+void USAttributeComponent::OnRep_Rage(float RageOld)
+{
+	OnRageChanged.Broadcast(this, Rage, Rage - RageOld);
+}
+
 USAttributeComponent* USAttributeComponent::GetAttributes(AActor* OfActor)
 {
 	if(OfActor)

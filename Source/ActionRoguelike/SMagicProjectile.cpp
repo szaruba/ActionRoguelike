@@ -50,17 +50,16 @@ void ASMagicProjectile::HandleOnOverlap(UPrimitiveComponent* OverlappedComponent
 			SetInstigator(Cast<APawn>(OtherActor));
 			return;
 		}
+
+		USGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(), OtherActor, Damage, SweepResult);
 		
-		if(USGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(), OtherActor, Damage, SweepResult))
+		// Apply burning effect
+		if (ActionComponent)
 		{
-			// Apply burning effect
-			if (ActionComponent)
-			{
-				ActionComponent->AddAction(GetInstigator(), BurningActionClass);
-			}
-			
-			Explode();
+			ActionComponent->AddAction(GetInstigator(), BurningActionClass);
 		}
+		
+		Explode();
 	}
 }
 
@@ -69,20 +68,23 @@ void ASMagicProjectile::HandleOnActorHit(UPrimitiveComponent* HitComponent, AAct
 {
 	if (OtherActor && OtherActor != GetInstigator())
 	{
-		if (USActionComponent* ActionComponent = USActionComponent::GetFrom(OtherActor))
+		USActionComponent* ActionComponent = USActionComponent::GetFrom(OtherActor);
+		if (ActionComponent && ActionComponent->ActiveTags.HasTagExact(ParryTag))
 		{
-			if (ActionComponent->ActiveTags.HasTagExact(ParryTag))
-			{
-				MovementComp->Velocity = -MovementComp->Velocity;
-				SetInstigator(Cast<APawn>(OtherActor));
-				return;
-			}
+			MovementComp->Velocity = -MovementComp->Velocity;
+			SetInstigator(Cast<APawn>(OtherActor));
+			return;
+		}
+
+		USGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(), OtherActor, Damage, Hit);
+		
+		// Apply burning effect
+		if (ActionComponent)
+		{
+			ActionComponent->AddAction(GetInstigator(), BurningActionClass);
 		}
 		
-		if(USGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(), OtherActor, Damage, Hit))
-		{
-			Explode();
-		}
+		Explode();
 	}
 }
 

@@ -16,6 +16,11 @@ void USWorldUserWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTim
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
 
+	if (!IsValid(AttachedActor))
+	{
+		RemoveFromParent();
+	}
+
 	APlayerController* PlayerController = GetOwningPlayer();
 	if (PlayerController)
 	{
@@ -29,6 +34,5 @@ void USWorldUserWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTim
 			float ViewportScale = UWidgetLayoutLibrary::GetViewportScale(PlayerController);
 			ParentSizeBox->SetRenderTranslation(ScreenPosition / ViewportScale);
 		}
-		
 	}
 }

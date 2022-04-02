@@ -34,11 +34,15 @@ void ASCharacterBase::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	AttributeComp->OnHealthChanged.AddDynamic(this, &ASCharacterBase::HandleHealthChanged);
-	OnPawnDied.AddLambda([this](AActor* InstigatorActor)
+	if(HasAuthority())
 	{
-		ASGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ASGameModeBase>();
-		GameMode->HandlePawnKilled(this, Cast<APawn>(InstigatorActor));
-	});
+		OnPawnDied.AddLambda([this](AActor* InstigatorActor)
+		{
+			ASGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ASGameModeBase>();
+			GameMode->HandlePawnKilled(this, Cast<APawn>(InstigatorActor));
+		});
+	}
+	
 }
 
 void ASCharacterBase::HandleHealthChanged(USAttributeComponent* OwningComp, AActor* InstigatorActor, float HealthNew,
@@ -51,8 +55,6 @@ void ASCharacterBase::HandleHealthChanged(USAttributeComponent* OwningComp, AAct
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		GetCharacterMovement()->DisableMovement();
 		
-		GetMesh()->SetAllBodiesSimulatePhysics(true);
-		GetMesh()->SetCollisionProfileName("Ragdoll");
 		SetLifeSpan(5.f);
 	}
 

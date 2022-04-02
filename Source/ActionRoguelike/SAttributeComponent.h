@@ -66,14 +66,17 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated)
 	float HealthMax;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, ReplicatedUsing="OnRep_Rage")
 	float Rage;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Replicated)
 	float RageMax;
 	// How many points of rage are gained per health point lost
 	UPROPERTY(EditAnywhere)
 	float RageGainRate;
-
+	
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastHealthChanged(AActor* InstigatorActor, float HealthNew, float HealthDelta);
+
+	UFUNCTION()
+	void OnRep_Rage(float RageOld);
 };

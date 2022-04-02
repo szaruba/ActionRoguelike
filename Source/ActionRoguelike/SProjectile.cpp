@@ -27,6 +27,8 @@ ASProjectile::ASProjectile()
 
 	AudioComp = CreateDefaultSubobject<UAudioComponent>("AudioComp");
 	AudioComp->SetupAttachment(ParticleSystemComp);
+
+	bReplicates = true;
 }
 
 // Called when the game starts or when spawned

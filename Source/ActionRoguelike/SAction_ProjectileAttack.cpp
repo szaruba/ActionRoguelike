@@ -26,10 +26,13 @@ void USAction_ProjectileAttack::StartAction_Implementation(AActor* ActionInstiga
 	
 	UGameplayStatics::SpawnEmitterAttached(Particles, InstigatorCharacter->GetMesh(), SpawnSocketName);
 	InstigatorCharacter->PlayAnimMontage(AttackAnim);
-	
-	FTimerDelegate TimerDelegate;
-	TimerDelegate.BindUObject(this, &USAction_ProjectileAttack::SpawnProjectile, InstigatorCharacter);
-	InstigatorCharacter->GetWorldTimerManager().SetTimer(TimerHandle_SpawnProjectile, TimerDelegate, SpawnDelay, false);
+
+	if (ActionInstigator->HasAuthority())
+	{
+		FTimerDelegate TimerDelegate;
+		TimerDelegate.BindUObject(this, &USAction_ProjectileAttack::SpawnProjectile, InstigatorCharacter);
+		InstigatorCharacter->GetWorldTimerManager().SetTimer(TimerHandle_SpawnProjectile, TimerDelegate, SpawnDelay, false);
+	}
 }
 
 void USAction_ProjectileAttack::StopAction_Implementation(AActor* ActionInstigator)

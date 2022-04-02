@@ -41,7 +41,7 @@ protected:
 	void ScanForTargetActor();
 
 	UFUNCTION(Server, Reliable)
-	void ServerPrimaryInteract(AActor* Target);
+	void ServerPrimaryInteract();
 
 public:
 	// Called every frame

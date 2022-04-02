@@ -24,23 +24,17 @@ void USAction::StartAction_Implementation(AActor* ActionInstigator)
 	
 	GetOwningComponent()->ActiveTags.AppendTags(GrantedTags);
 	
-	if(GetTypedOuter<AActor>()->HasAuthority())
-	{
-		RepData.bIsRunning = true;
-		RepData.Instigator = ActionInstigator;
-	}
+	RepData.bIsRunning = true;
+	RepData.Instigator = ActionInstigator;
 }
 
 void USAction::StopAction_Implementation(AActor* ActionInstigator)
 {
 	UE_LOG(LogTemp, Display, TEXT("Stop Action %s"), *GetNameSafe(this));
 	GetOwningComponent()->ActiveTags.RemoveTags(GrantedTags);
-
-	if(GetTypedOuter<AActor>()->HasAuthority())
-	{
-		RepData.bIsRunning = false;
-		RepData.Instigator = ActionInstigator;
-	}
+	
+	RepData.bIsRunning = false;
+	RepData.Instigator = ActionInstigator;
 }
 
 bool USAction::CanStart_Implementation(AActor* ActionInstigator) const

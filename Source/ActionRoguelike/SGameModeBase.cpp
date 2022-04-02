@@ -7,6 +7,7 @@
 #include "SCoinPickup.h"
 #include "SPlayerState.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
+#include "GameFramework/GameStateBase.h"
 #include "Kismet/GameplayStatics.h"
 
 static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("su.SpawnBots"), false, TEXT("Enable/Disable bot spawning"), ECVF_Cheat);
@@ -14,6 +15,7 @@ static TAutoConsoleVariable<bool> CVarSpawnCoins = TAutoConsoleVariable<bool>(TE
 
 ASGameModeBase::ASGameModeBase()
 {
+	PrimaryActorTick.bCanEverTick = true;
 	BotSpawnRate = 5.f;
 	CoinSpawnRate = 3.f;
 
@@ -116,6 +118,19 @@ void ASGameModeBase::DisposeCorpse(APawn* KilledPawn)
 			KilledPawn->Destroy();
 		}
 	});
+}
+
+void ASGameModeBase::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	// for(APlayerState* PlayerState : GetGameState<AGameStateBase>()->PlayerArray)
+	// {
+	// 	if (ASPlayerState* SPlayerState = Cast<ASPlayerState>(PlayerState))
+	// 	{
+	// 		SPlayerState->AddCredits(1);
+	// 	}
+	// }
 }
 
 void ASGameModeBase::HandleSpawnBotQueryFinished(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus)

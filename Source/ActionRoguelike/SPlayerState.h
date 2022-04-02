@@ -10,6 +10,7 @@
 class ASPlayerState;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnCreditsChanged, ASPlayerState*, ChangedInState, int32, NewAmount, int32, Delta);
 
+
 UCLASS()
 class ACTIONROGUELIKE_API ASPlayerState : public APlayerState
 {
@@ -35,7 +36,17 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnCreditsChanged OnCreditsChanged;
+
+protected:
+	UFUNCTION(Server, Reliable)
+	void ServerAddCredits(int32 Amount);
+
+	UFUNCTION(Server, Reliable)
+	void ServerRemoveCredits(int32 Amount);
 	
 private:
+	UPROPERTY(ReplicatedUsing="OnRep_Credits")
 	int32 Credits;
+	UFUNCTION()
+	void OnRep_Credits(int32 CreditsOld);
 };

@@ -20,15 +20,15 @@ USInteractComponent::USInteractComponent()
 
 void USInteractComponent::PrimaryInteract()
 {
-	ServerPrimaryInteract(TargetActor);
+	ServerPrimaryInteract();
 }
 
-void USInteractComponent::ServerPrimaryInteract_Implementation(AActor* Target)
+void USInteractComponent::ServerPrimaryInteract_Implementation()
 {
 	APawn* InstigatorPawn = Cast<APawn>(GetOwner());
-	if (Target && ensure(InstigatorPawn))
+	if (TargetActor && ensure(InstigatorPawn))
 	{
-		ISGameplayInterface::Execute_Interact(Target, InstigatorPawn);
+		ISGameplayInterface::Execute_Interact(TargetActor, InstigatorPawn);
 	}
 }
 
@@ -82,29 +82,32 @@ void USInteractComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (GetOwner<APawn>()->IsLocallyControlled())
+	if (GetOwner<APawn>()->IsLocallyControlled() || GetOwner<APawn>()->HasAuthority())
 	{
 		ScanForTargetActor();
 	}
-
-	// Handle Overlay Widget
-	if (TargetActor)
+	
+	if (GetOwner<APawn>()->IsLocallyControlled())
 	{
-		if (!OverlayWidget && ensure(OverlayWidgetClass))
+		// Handle Overlay Widget
+		if (TargetActor)
 		{
-			OverlayWidget = CreateWidget<USWorldUserWidget>(GetWorld(), OverlayWidgetClass);
-		}
+			if (!OverlayWidget && ensure(OverlayWidgetClass))
+			{
+				OverlayWidget = CreateWidget<USWorldUserWidget>(GetWorld(), OverlayWidgetClass);
+			}
 		
-		OverlayWidget->AttachedActor = TargetActor;
+			OverlayWidget->AttachedActor = TargetActor;
 
-		if (!OverlayWidget->IsInViewport())
-		{
-			OverlayWidget->AddToViewport();
+			if (!OverlayWidget->IsInViewport())
+			{
+				OverlayWidget->AddToViewport();
+			}
 		}
-	}
-	if (!TargetActor && OverlayWidget && OverlayWidget->IsInViewport())
-	{
-		OverlayWidget->RemoveFromParent();
+		if (!TargetActor && OverlayWidget && OverlayWidget->IsInViewport())
+		{
+			OverlayWidget->RemoveFromParent();
+		}
 	}
 }
 

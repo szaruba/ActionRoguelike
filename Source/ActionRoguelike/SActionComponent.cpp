@@ -64,6 +64,11 @@ void USActionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 
 void USActionComponent::AddAction(AActor* Instigator, TSubclassOf<USAction> ActionClass)
 {
+	if (!GetOwner()->HasAuthority())
+	{
+		return;
+	}
+	
 	if(!ensure(ActionClass))
 	{
 		return;
@@ -85,6 +90,11 @@ bool USActionComponent::HasActionClass(TSubclassOf<USAction> ActionClass) const
 
 void USActionComponent::RemoveAction(USAction* Action)
 {
+	if (!GetOwner()->HasAuthority())
+	{
+		return;
+	}
+	
 	if(!ensure(Action && !Action->IsRunning()))
 	{
 		return;
@@ -95,6 +105,11 @@ void USActionComponent::RemoveAction(USAction* Action)
 
 void USActionComponent::RemoveActionClass(TSubclassOf<USAction> ActionClass)
 {
+	if (!GetOwner()->HasAuthority())
+	{
+		return;
+	}
+	
 	for (int32 Index = Actions.Num() - 1; Index >= 0; --Index)
 	{
 		if (Actions[Index]->IsA(ActionClass))

@@ -57,11 +57,8 @@ protected:
 	void RespawnPlayer(APlayerController* PlayerController);
 	void DisposeCorpse(APawn* KilledPawn);
 
-	void TestFunction1();
-	bool TestFunction2();
-	void TestFunction3(float Value);
-	bool TestFunction4(float Value);
-	
+
+	virtual void Tick(float DeltaSeconds) override;
 
 private:
 	UFUNCTION()

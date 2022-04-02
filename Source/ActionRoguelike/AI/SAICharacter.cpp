@@ -69,6 +69,9 @@ void ASAICharacter::HandleHealthChanged(USAttributeComponent* OwningComp, AActor
 	
 	if (HealthNew <= 0.f)
 	{
+		GetMesh()->SetAllBodiesSimulatePhysics(true);
+		GetMesh()->SetCollisionProfileName("Ragdoll");
+		
 		AAIController* AIController = Cast<AAIController>(GetController());
 		if (AIController)
 		{
