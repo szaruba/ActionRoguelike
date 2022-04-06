@@ -7,9 +7,11 @@
 #include "AI/SAICharacter.h"
 #include "EnvironmentQuery/EnvQuery.h"
 #include "GameFramework/GameModeBase.h"
+#include "GameFramework/SaveGame.h"
 #include "SGameModeBase.generated.h"
 
 
+class USSaveGame;
 class UEnvQueryInstanceBlueprintWrapper;
 /**
  * 
@@ -27,6 +29,12 @@ public:
 
 	UFUNCTION()
 	void HandlePawnKilled(APawn* KilledPawn, APawn* InstigatorPawn);
+
+	UFUNCTION(BlueprintCallable)
+	void WriteSaveGame();
+	UFUNCTION(BlueprintCallable)
+	void LoadSaveGame();
+	
 protected:
 
 	UPROPERTY(EditAnywhere)
@@ -59,6 +67,10 @@ protected:
 
 
 	virtual void Tick(float DeltaSeconds) override;
+	
+	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
+	
+	virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
 
 private:
 	UFUNCTION()
@@ -66,4 +78,9 @@ private:
 
 	UFUNCTION()
 	void HandleSpawnCoinQueryFinished(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
+
+	FString SlotName;
+
+	UPROPERTY()
+	USSaveGame* CurrentSaveGame;
 };

@@ -27,7 +27,7 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float MaxLidAngle = 110.f;
 
-	UPROPERTY(ReplicatedUsing="OnRep_LidOpen")
+	UPROPERTY(ReplicatedUsing="OnRep_LidOpen", SaveGame)
 	bool bLidOpen;
 
 	UFUNCTION()
@@ -41,6 +41,8 @@ protected:
 	virtual void BeginPlay() override;
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutLifetimeProps) const override;
+
+	virtual void OnActorLoaded_Implementation() override;
 	
 public:
 	// Called every frame

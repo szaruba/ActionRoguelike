@@ -6,9 +6,11 @@
 #include "EngineUtils.h"
 #include "SCoinPickup.h"
 #include "SPlayerState.h"
+#include "SSaveGame.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
 #include "GameFramework/GameStateBase.h"
 #include "Kismet/GameplayStatics.h"
+#include "Serialization/ObjectAndNameAsStringProxyArchive.h"
 
 static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("su.SpawnBots"), false, TEXT("Enable/Disable bot spawning"), ECVF_Cheat);
 static TAutoConsoleVariable<bool> CVarSpawnCoins = TAutoConsoleVariable<bool>(TEXT("su.SpawnCoins"), true, TEXT("Should spawn coins periodically"));
@@ -20,7 +22,107 @@ ASGameModeBase::ASGameModeBase()
 	CoinSpawnRate = 3.f;
 
 	PlayerStateClass = ASPlayerState::StaticClass();
+
+	SlotName = "SaveGame01";
 }
+
+void ASGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
+{
+	Super::InitGame(MapName, Options, ErrorMessage);
+
+	LoadSaveGame();
+}
+
+void ASGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
+{
+	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
+
+	if (ASPlayerState* PlayerState = Cast<ASPlayerState>(NewPlayer->PlayerState))
+	{
+		PlayerState->LoadPlayerState(CurrentSaveGame);
+	}
+}
+
+void ASGameModeBase::WriteSaveGame()
+{
+	if (!ensure(CurrentSaveGame))
+	{
+		return;
+	}
+
+	CurrentSaveGame->SavedActors.Empty();
+	CurrentSaveGame->SavedPlayers.Empty();
+	
+	for (APlayerState* PlayerState : GameState->PlayerArray)
+	{
+		if (ASPlayerState* SPlayerState = Cast<ASPlayerState>(PlayerState))
+		{
+			SPlayerState->SavePlayerState(CurrentSaveGame);
+			break;
+		}
+	}
+
+	for (FActorIterator It(GetWorld()); It; ++It)
+	{
+		AActor* Actor = *It;
+		if (!Actor->Implements<USGameplayInterface>())
+		{
+			continue;
+		}
+
+		FSaveDataActor SaveDataActor;
+		SaveDataActor.Name = Actor->GetFName();
+		SaveDataActor.Transform = Actor->GetTransform();
+
+		
+		FMemoryWriter MemWriter(SaveDataActor.ByteData);
+		FObjectAndNameAsStringProxyArchive Ar(MemWriter, true);
+		Ar.ArIsSaveGame = true;
+		Actor->Serialize(Ar);
+		
+		CurrentSaveGame->SavedActors.Add(SaveDataActor);
+	}
+	
+	UGameplayStatics::SaveGameToSlot(CurrentSaveGame, SlotName, 0);
+}
+
+void ASGameModeBase::LoadSaveGame()
+{
+	if (USSaveGame* LoadedSaveGame = Cast<USSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName, 0)))
+	{
+		CurrentSaveGame = LoadedSaveGame;
+	}
+	else
+	{
+		CurrentSaveGame = Cast<USSaveGame>(UGameplayStatics::CreateSaveGameObject(USSaveGame::StaticClass()));
+	}
+
+	for (FActorIterator It(GetWorld()); It; ++It)
+	{
+		AActor* Actor = *It;
+		if (!Actor->Implements<USGameplayInterface>())
+		{
+			continue;
+		}
+
+		for (FSaveDataActor SaveDataActor : CurrentSaveGame->SavedActors)
+		{
+			if (Actor->GetFName() == SaveDataActor.Name)
+			{
+				Actor->SetActorTransform(SaveDataActor.Transform);
+
+				FMemoryReader MemReader(SaveDataActor.ByteData);
+				FObjectAndNameAsStringProxyArchive Ar(MemReader, true);
+				Ar.ArIsSaveGame = true;
+				Actor->Serialize(Ar);
+				ISGameplayInterface::Execute_OnActorLoaded(Actor);
+				break;
+			}
+		}
+		
+	}
+}
+
 
 void ASGameModeBase::KillAll()
 {
@@ -132,6 +234,8 @@ void ASGameModeBase::Tick(float DeltaSeconds)
 	// 	}
 	// }
 }
+
+
 
 void ASGameModeBase::HandleSpawnBotQueryFinished(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus)
 {

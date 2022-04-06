@@ -71,6 +71,11 @@ void ASItemChest::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 	DOREPLIFETIME(ASItemChest, bLidOpen);
 }
 
+void ASItemChest::OnActorLoaded_Implementation()
+{
+	OnRep_LidOpen();
+}
+
 // Called every frame
 void ASItemChest::Tick(float DeltaTime)
 {

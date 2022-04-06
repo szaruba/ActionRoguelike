@@ -24,4 +24,8 @@ class ACTIONROGUELIKE_API ISGameplayInterface
 public:
 	UFUNCTION(BlueprintNativeEvent)
 	void Interact(APawn* InstigatorPawn);
+
+	/* Called after the Actor's state was loaded from a SaveGame */
+	UFUNCTION(BlueprintNativeEvent)
+	void OnActorLoaded();
 };

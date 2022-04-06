@@ -3,6 +3,7 @@
 
 #include "SPlayerState.h"
 
+#include "SSaveGame.h"
 #include "Net/UnrealNetwork.h"
 
 
@@ -70,6 +71,22 @@ void ASPlayerState::ServerRemoveCredits_Implementation(int32 Amount)
 int32 ASPlayerState::GetCredits() const
 {
 	return Credits;
+}
+
+void ASPlayerState::SavePlayerState(USSaveGame* SG)
+{
+	if (ensureAlways(SG))
+	{
+		SG->Credits = Credits;
+	}
+}
+
+void ASPlayerState::LoadPlayerState(USSaveGame* SG)
+{
+	if (ensure(SG))
+	{
+		Credits = SG->Credits;
+	}
 }
 
 void ASPlayerState::OnRep_Credits(int32 CreditsOld)
