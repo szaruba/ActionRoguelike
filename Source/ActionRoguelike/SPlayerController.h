@@ -20,4 +20,16 @@ public:
 	FOnPossess OnPossessDelegate;
 
 	virtual void InitPlayerState() override;
+
+	UFUNCTION(BlueprintCallable)
+	void TogglePauseMenu();
+
+protected:
+	UPROPERTY()
+	UUserWidget* PauseMenuWidget;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> PauseMenuWidgetClass;
+
+	virtual void SetupInputComponent() override;
 };
