@@ -48,6 +48,20 @@ void USActionEffect::StopAction_Implementation(AActor* ActionInstigator)
 	}
 }
 
+float USActionEffect::GetDuration() const
+{
+	return Duration;
+}
+
+float USActionEffect::GetTimeRemaining() const
+{
+	if (!ensure(GetWorld()))
+	{
+		return 0.0;
+	}
+	return TimeStarted + Duration - GetWorld()->GetTimeSeconds();
+}
+
 void USActionEffect::ExecutePeriodicEffect_Implementation(AActor* ActionInstigator)
 {
 	

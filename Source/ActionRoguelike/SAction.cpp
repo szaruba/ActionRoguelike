@@ -26,6 +26,11 @@ void USAction::StartAction_Implementation(AActor* ActionInstigator)
 	
 	RepData.bIsRunning = true;
 	RepData.Instigator = ActionInstigator;
+
+	UWorld* World = GetWorld();
+	ensure(World);
+	TimeStarted = World->GetTimeSeconds();
+	GetOwningComponent()->OnActionStarted.Broadcast(GetOwningComponent(), this);
 }
 
 void USAction::StopAction_Implementation(AActor* ActionInstigator)
@@ -35,6 +40,8 @@ void USAction::StopAction_Implementation(AActor* ActionInstigator)
 	
 	RepData.bIsRunning = false;
 	RepData.Instigator = ActionInstigator;
+	OnActionStopped.Broadcast();
+	GetOwningComponent()->OnActionStopped.Broadcast(GetOwningComponent(), this);
 }
 
 bool USAction::CanStart_Implementation(AActor* ActionInstigator) const
@@ -82,6 +89,11 @@ UWorld* USAction::GetWorld() const
 		return OwningActor->GetWorld();
 	}
 	return nullptr;
+}
+
+float USAction::GetTimeStarted() const
+{
+	return TimeStarted;
 }
 
 void USAction::OnRep_RepData()

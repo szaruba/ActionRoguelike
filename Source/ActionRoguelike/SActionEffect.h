@@ -24,6 +24,12 @@ public:
 	UFUNCTION(BlueprintNativeEvent)
 	void ExecutePeriodicEffect(AActor* ActionInstigator);
 
+	UFUNCTION(BlueprintPure)
+	float GetDuration() const;
+
+	UFUNCTION(BlueprintPure)
+	float GetTimeRemaining() const;
+	
 protected:
 	UPROPERTY(EditAnywhere)
 	float Period;

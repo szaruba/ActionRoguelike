@@ -21,6 +21,8 @@ struct FActionRepData
 	AActor* Instigator;
 };
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnActionStopped);
+
 /**
  * Action can only be started if it is not running already and is not blocked by active BlockedTags in the owning comp
  * Action can only be stopped if it is running.
@@ -35,6 +37,9 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FName Name;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UTexture2D* Icon;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FGameplayTagContainer GrantedTags;
@@ -66,6 +71,12 @@ public:
 	{
 		return true;
 	}
+
+	UFUNCTION(BlueprintPure)
+	float GetTimeStarted() const;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnActionStopped OnActionStopped;
 	
 protected:
 	UPROPERTY(EditAnywhere)
@@ -79,4 +90,6 @@ protected:
 
 	UFUNCTION()
 	void OnRep_RepData();
+
+	float TimeStarted;
 };
