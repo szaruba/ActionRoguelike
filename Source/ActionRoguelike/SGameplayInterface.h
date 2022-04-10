@@ -28,4 +28,7 @@ public:
 	/* Called after the Actor's state was loaded from a SaveGame */
 	UFUNCTION(BlueprintNativeEvent)
 	void OnActorLoaded();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	FText GetInteractionDetailMessage(APawn* InstigatorPawn) const;
 };

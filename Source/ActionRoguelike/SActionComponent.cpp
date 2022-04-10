@@ -160,6 +160,18 @@ bool USActionComponent::StopActionByName(AActor* Instigator, const FName ActionN
 	return false;
 }
 
+USAction* USActionComponent::GetActionByClass(TSubclassOf<USAction> ActionClass)
+{
+	for (USAction* Action : Actions)
+	{
+		if (Action->IsA(ActionClass))
+		{
+			return Action;
+		}
+	}
+	return nullptr;
+}
+
 void USActionComponent::ServerStartActionByName_Implementation(AActor* Instigator, const FName ActionName)
 {
 	StartActionByName(Instigator, ActionName);

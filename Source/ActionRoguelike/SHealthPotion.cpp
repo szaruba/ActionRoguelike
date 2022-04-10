@@ -4,8 +4,11 @@
 #include "SHealthPotion.h"
 
 #include "SAttributeComponent.h"
+#include "SInteractComponent.h"
 #include "SPlayerState.h"
 
+
+#define LOCTEXT_NAMESPACE "InteractableActors"
 
 // Sets default values
 ASHealthPotion::ASHealthPotion()
@@ -52,5 +55,22 @@ void ASHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 		}
 	}
 	
+}
+
+FText ASHealthPotion::GetInteractionDetailMessage_Implementation(APawn* InstigatorPawn) const
+{
+	USAttributeComponent* AttrComp = USAttributeComponent::GetAttributes(InstigatorPawn);
+	if (AttrComp && AttrComp->IsFullHealth())
+	{
+		return FText(LOCTEXT("HealthPotion_FullHealthWarning", "Already at full health!"));
+	}
+	if (ASPlayerState* PlayerState = InstigatorPawn->GetPlayerState<ASPlayerState>())
+	{
+		if (PlayerState->GetCredits() < CreditCost)
+		{
+			return FText::Format(LOCTEXT("HealthPotion_NotEnoughCreditsWarning", "Need {0} credits to buy this potion."), CreditCost);
+		}
+	}
+	return FText::GetEmpty();
 }
 

@@ -62,6 +62,9 @@ public:
 	FOnActionStateChanged OnActionStopped;
 
 	virtual bool ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
+	
+	UFUNCTION(BlueprintCallable)
+	USAction* GetActionByClass(TSubclassOf<USAction> ActionClass);
 
 protected:
 	UPROPERTY(EditAnywhere)

@@ -90,23 +90,16 @@ void USInteractComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	if (GetOwner<APawn>()->IsLocallyControlled())
 	{
 		// Handle Overlay Widget
-		if (TargetActor)
+		if (TargetActor && !OverlayWidget && ensure(OverlayWidgetClass))
 		{
-			if (!OverlayWidget && ensure(OverlayWidgetClass))
-			{
-				OverlayWidget = CreateWidget<USWorldUserWidget>(GetWorld(), OverlayWidgetClass);
-			}
-		
+			OverlayWidget = CreateWidget<USWorldUserWidget>(GetWorld(), OverlayWidgetClass);
 			OverlayWidget->AttachedActor = TargetActor;
-
-			if (!OverlayWidget->IsInViewport())
-			{
-				OverlayWidget->AddToViewport();
-			}
+			OverlayWidget->AddToViewport();
 		}
-		if (!TargetActor && OverlayWidget && OverlayWidget->IsInViewport())
+		else if (!TargetActor && OverlayWidget)
 		{
 			OverlayWidget->RemoveFromParent();
+			OverlayWidget = nullptr;
 		}
 	}
 }

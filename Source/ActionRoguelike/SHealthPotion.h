@@ -30,4 +30,6 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
+
+	virtual FText GetInteractionDetailMessage_Implementation(APawn* InstigatorPawn) const override;
 };
