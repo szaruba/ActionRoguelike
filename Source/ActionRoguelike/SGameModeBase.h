@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "SCoinPickup.h"
 #include "AI/SAICharacter.h"
+#include "Engine/DataTable.h"
 #include "EnvironmentQuery/EnvQuery.h"
 #include "GameFramework/GameModeBase.h"
 #include "GameFramework/SaveGame.h"
@@ -13,6 +14,9 @@
 
 class USSaveGame;
 class UEnvQueryInstanceBlueprintWrapper;
+
+
+
 /**
  * 
  */
@@ -34,9 +38,15 @@ public:
 	void WriteSaveGame();
 	UFUNCTION(BlueprintCallable)
 	void LoadSaveGame();
+
+	UFUNCTION(Exec)
+	void SpawnBots(int32 Amount = 1);
 	
 protected:
 
+	UPROPERTY(EditAnywhere)
+	UDataTable* MonsterTable;
+	
 	UPROPERTY(EditAnywhere)
 	float BotSpawnRate;
 	UPROPERTY(EditAnywhere)

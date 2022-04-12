@@ -49,17 +49,17 @@ void USActionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	for (USAction* Action : Actions)
-	{
-		FColor Color = Action->IsRunning() ? FColor::Blue : FColor::White;
-		FString Message = FString::Printf(TEXT("[%s] Action: %s : IsRunning: %s : Outer: %s"),
-			*GetNameSafe(GetOwner()),
-			*Action->Name.ToString(),
-			Action->IsRunning() ? TEXT("true") : TEXT("false"),
-			*GetNameSafe(Action->GetOuter()));
-		
-		LogOnScreen(this, Message, Color, 0.0f);
-	}
+	// for (USAction* Action : Actions)
+	// {
+	// 	FColor Color = Action->IsRunning() ? FColor::Blue : FColor::White;
+	// 	FString Message = FString::Printf(TEXT("[%s] Action: %s : IsRunning: %s : Outer: %s"),
+	// 		*GetNameSafe(GetOwner()),
+	// 		*Action->Name.ToString(),
+	// 		Action->IsRunning() ? TEXT("true") : TEXT("false"),
+	// 		*GetNameSafe(Action->GetOuter()));
+	// 	
+	// 	LogOnScreen(this, Message, Color, 0.0f);
+	// }
 }
 
 void USActionComponent::AddAction(AActor* Instigator, TSubclassOf<USAction> ActionClass)

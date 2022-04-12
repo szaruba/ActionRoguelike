@@ -18,6 +18,11 @@ class ACTIONROGUELIKE_API USAttributeComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated)
+	float Health;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated)
+	float HealthMax;
+	
 	UFUNCTION(BlueprintPure)
 	static USAttributeComponent* GetAttributes(AActor* OfActor);
 
@@ -61,10 +66,7 @@ public:
 	float GetRageGainRate() const;
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated)
-	float Health;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated)
-	float HealthMax;
+	
 
 	UPROPERTY(EditAnywhere, ReplicatedUsing="OnRep_Rage")
 	float Rage;

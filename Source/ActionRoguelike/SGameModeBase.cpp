@@ -8,6 +8,8 @@
 #include "SPlayerState.h"
 #include "SSaveGame.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
+#include "GameData/FSMonsterInfoRow.h"
+#include "GameData/SMonsterData.h"
 #include "GameFramework/GameStateBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Serialization/ObjectAndNameAsStringProxyArchive.h"
@@ -121,6 +123,17 @@ void ASGameModeBase::LoadSaveGame()
 		}
 		
 	}
+}
+
+void ASGameModeBase::SpawnBots(int32 Amount)
+{
+	bool bShouldSpawn = CVarSpawnBots.GetValueOnGameThread();
+	CVarSpawnBots->Set(true);
+	for (int32 i = 0; i < Amount; ++i)
+	{
+		RunSpawnBotQuery();
+	}
+	CVarSpawnBots->Set(bShouldSpawn);
 }
 
 
@@ -243,16 +256,31 @@ void ASGameModeBase::HandleSpawnBotQueryFinished(UEnvQueryInstanceBlueprintWrapp
 	if (QueryStatus == EEnvQueryStatus::Type::Success && BotSpawnLocations.IsValidIndex(0))
 	{
 		FVector SpawnLocation = BotSpawnLocations[0];
-		ASAICharacter* AICharacter = GetWorld()->SpawnActor<ASAICharacter>(BotCharacterClass, SpawnLocation, FRotator::ZeroRotator);
 
-		// Handled in ASCharacterBase for both Player and Bots
-		// AICharacter->OnPawnDied.AddLambda([this, AICharacter](AActor* InstigatorActor)
-		// {
-		// 	if (this)
-		// 	{
-		// 		this->HandlePawnKilled(AICharacter, Cast<APawn>(InstigatorActor));
-		// 	}
-		// });
+		if (ensure(MonsterTable))
+		{
+			TArray<FSMonsterInfoRow*> Rows;
+			MonsterTable->GetAllRows("", Rows);
+			FSMonsterInfoRow* MonsterInfo = Rows[FMath::RandRange(0, Rows.Num()-1)];
+			
+			ASAICharacter* Bot = GetWorld()->SpawnActor<ASAICharacter>(BotCharacterClass, SpawnLocation, FRotator::ZeroRotator);
+			USActionComponent* ActionComp = USActionComponent::GetFrom(Bot);
+			USAttributeComponent* AttributeComp = USAttributeComponent::GetAttributes(Bot);
+
+			USMonsterData* MonsterData = Cast<USMonsterData>(MonsterInfo->MonsterData);
+			for (TSubclassOf<USAction> ActionClass : MonsterData->Actions)
+			{
+				ActionComp->AddAction(this, ActionClass);
+			}
+
+			AttributeComp->HealthMax = MonsterData->MaxHealth;
+			AttributeComp->Health = MonsterData->MaxHealth;
+			Bot->Level = MonsterData->MonsterLevel;
+			if (MonsterData->MonsterLevel > 15)
+			{
+				Bot->SetActorScale3D(FVector(2.f, 2.f, 2.f));
+			}
+		}
 	}
 }
 

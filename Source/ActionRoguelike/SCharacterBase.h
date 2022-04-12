@@ -46,4 +46,7 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	bool IsAlive() const;
+
+	UPROPERTY(BlueprintReadOnly)
+	uint8 Level;
 };
