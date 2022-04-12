@@ -16,7 +16,7 @@ struct FSMonsterInfoRow : public FTableRowBase
 	}
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	UPrimaryDataAsset* MonsterData;
+	FPrimaryAssetId MonsterId;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float Weight;

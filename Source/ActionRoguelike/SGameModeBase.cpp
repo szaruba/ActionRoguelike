@@ -7,6 +7,7 @@
 #include "SCoinPickup.h"
 #include "SPlayerState.h"
 #include "SSaveGame.h"
+#include "Engine/AssetManager.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
 #include "GameData/FSMonsterInfoRow.h"
 #include "GameData/SMonsterData.h"
@@ -249,6 +250,30 @@ void ASGameModeBase::Tick(float DeltaSeconds)
 }
 
 
+void ASGameModeBase::OnMonsterLoaded(FPrimaryAssetId MonsterId, FVector SpawnLocation)
+{
+	if (UAssetManager* AssetManager = UAssetManager::GetIfValid())
+	{
+		USMonsterData* MonsterData = Cast<USMonsterData>(AssetManager->GetPrimaryAssetObject(MonsterId));
+
+		ASAICharacter* Bot = GetWorld()->SpawnActor<ASAICharacter>(MonsterData->MonsterClass, SpawnLocation, FRotator::ZeroRotator);
+		USActionComponent* ActionComp = USActionComponent::GetFrom(Bot);
+		USAttributeComponent* AttributeComp = USAttributeComponent::GetAttributes(Bot);
+	
+		for (TSubclassOf<USAction> ActionClass : MonsterData->Actions)
+		{
+			ActionComp->AddAction(this, ActionClass);
+		}
+
+		AttributeComp->HealthMax = MonsterData->MaxHealth;
+		AttributeComp->Health = MonsterData->MaxHealth;
+		Bot->Level = MonsterData->MonsterLevel;
+		if (MonsterData->MonsterLevel > 15)
+		{
+			Bot->SetActorScale3D(FVector(2.f, 2.f, 2.f));
+		}
+	}
+}
 
 void ASGameModeBase::HandleSpawnBotQueryFinished(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus)
 {
@@ -262,23 +287,12 @@ void ASGameModeBase::HandleSpawnBotQueryFinished(UEnvQueryInstanceBlueprintWrapp
 			TArray<FSMonsterInfoRow*> Rows;
 			MonsterTable->GetAllRows("", Rows);
 			FSMonsterInfoRow* MonsterInfo = Rows[FMath::RandRange(0, Rows.Num()-1)];
-			
-			ASAICharacter* Bot = GetWorld()->SpawnActor<ASAICharacter>(BotCharacterClass, SpawnLocation, FRotator::ZeroRotator);
-			USActionComponent* ActionComp = USActionComponent::GetFrom(Bot);
-			USAttributeComponent* AttributeComp = USAttributeComponent::GetAttributes(Bot);
 
-			USMonsterData* MonsterData = Cast<USMonsterData>(MonsterInfo->MonsterData);
-			for (TSubclassOf<USAction> ActionClass : MonsterData->Actions)
+			FPrimaryAssetId AssetId = MonsterInfo->MonsterId;
+			if (UAssetManager* AssetManager = UAssetManager::GetIfValid())
 			{
-				ActionComp->AddAction(this, ActionClass);
-			}
-
-			AttributeComp->HealthMax = MonsterData->MaxHealth;
-			AttributeComp->Health = MonsterData->MaxHealth;
-			Bot->Level = MonsterData->MonsterLevel;
-			if (MonsterData->MonsterLevel > 15)
-			{
-				Bot->SetActorScale3D(FVector(2.f, 2.f, 2.f));
+				FStreamableDelegate OnLoadedDelegate = FStreamableDelegate::CreateUObject(this, &ASGameModeBase::OnMonsterLoaded, AssetId, SpawnLocation);
+				AssetManager->LoadPrimaryAsset(AssetId, TArray<FName>(), OnLoadedDelegate);
 			}
 		}
 	}

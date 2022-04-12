@@ -59,9 +59,6 @@ protected:
 	UEnvQuery* EnvQuery_FindCoinSpawn;
 
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<ASAICharacter> BotCharacterClass;
-
-	UPROPERTY(EditAnywhere)
 	float CoinSpawnRate;
 
 	UPROPERTY(EditAnywhere)
@@ -77,7 +74,8 @@ protected:
 
 
 	virtual void Tick(float DeltaSeconds) override;
-	
+	void OnMonsterLoaded(FPrimaryAssetId MonsterId, FVector SpawnLocation);
+
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 	
 	virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;

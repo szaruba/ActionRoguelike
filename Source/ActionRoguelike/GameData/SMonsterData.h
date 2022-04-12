@@ -33,4 +33,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	uint8 MonsterLevel;
+
+	virtual FPrimaryAssetId GetPrimaryAssetId() const override
+	{
+		return FPrimaryAssetId("Monsters", GetFName());
+	}
 };
